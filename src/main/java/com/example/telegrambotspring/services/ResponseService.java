@@ -1,7 +1,7 @@
 package com.example.telegrambotspring.services;
 
 public interface ResponseService {
-	void updateResponseSets() throws Exception;
+	void updateSongCouplets(String artist) throws Exception;
 
 	String getResponse(String... text) throws Exception;
 }

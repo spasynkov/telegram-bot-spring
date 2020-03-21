@@ -1,13 +1,9 @@
 package com.example.telegrambotspring.services;
 
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
-import com.example.telegrambotspring.entities.ResponseSet;
-import com.example.telegrambotspring.entities.SongCouplet;
 import com.example.telegrambotspring.repositories.SongsRepository;
 
 @Service
@@ -21,12 +17,9 @@ public class DatabaseResponseService extends AbstractResponseService implements 
 	}
 
 	@Override
-	public void updateResponseSets() throws Exception {
-		sets = repository.findAll()
-				.parallelStream()
-				.filter(x -> "Гражданин Топинамбур".equals(x.getArtist()))
-				.map(SongCouplet::getText)  // Couplet -> List<String>
-				.map(ResponseSet::new)      // List<String> -> ResponseSet
-				.collect(Collectors.toList());
+	public void updateSongCouplets(String artist) throws Exception {
+		sets = artist == null
+				? repository.findAll()
+				: repository.findAllByArtist(artist);
 	}
 }
