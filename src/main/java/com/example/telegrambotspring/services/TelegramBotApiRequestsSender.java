@@ -20,8 +20,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
-public class RequestsSender {
-	private static final Logger LOGGER = LoggerFactory.getLogger(RequestsSender.class);
+public class TelegramBotApiRequestsSender {
+	private static final Logger LOGGER = LoggerFactory.getLogger(TelegramBotApiRequestsSender.class);
 
 	@Value("${telegram.bot.token}")
 	private String token;

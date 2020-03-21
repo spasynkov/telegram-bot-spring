@@ -16,8 +16,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import com.example.telegrambotspring.entities.Chat;
-import com.example.telegrambotspring.services.RequestsSender;
 import com.example.telegrambotspring.services.ResponseService;
+import com.example.telegrambotspring.services.TelegramBotApiRequestsSender;
 
 @Component
 public class BotRunner implements CommandLineRunner {
@@ -34,7 +34,7 @@ public class BotRunner implements CommandLineRunner {
 	private static final String START = "/start";
 	private static final String GREETINGS = "привіт)\nдавай поспіваємо";
 	private static final String MASTER_GREETINGS = "Слухаю тебе";
-	private final RequestsSender requestsSender;
+	private final TelegramBotApiRequestsSender requestsSender;
 	private final ResponseService responseService;
 	private final Map<Chat, Utils.Pair<Long, String>> answersForChats = new ConcurrentHashMap<>();
 	private Thread sendResponsesThread;
@@ -45,7 +45,7 @@ public class BotRunner implements CommandLineRunner {
 	private boolean isStopNeeded = false;
 
 	@Autowired
-	public BotRunner(RequestsSender requestsSender, ResponseService responseService) {
+	public BotRunner(TelegramBotApiRequestsSender requestsSender, ResponseService responseService) {
 		this.requestsSender = requestsSender;
 		this.responseService = responseService;
 	}
