@@ -22,7 +22,7 @@ public class FileBasedResponseService extends AbstractResponseService implements
 	}
 
 	@Override
-	protected void updateResponseSets() throws Exception {
+	public void updateResponseSets() throws Exception {
 		try {
 			initFile();
 		} catch (FileNotFoundException e) {

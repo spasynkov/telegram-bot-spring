@@ -9,8 +9,6 @@ import com.example.telegrambotspring.entities.ResponseSet;
 public abstract class AbstractResponseService implements ResponseService {
 	protected List<ResponseSet> sets = new LinkedList<>();
 
-	protected abstract void updateResponseSets() throws Exception;
-
 	@Override
 	public String getResponse(String... textParts) throws Exception {
 		if (sets.isEmpty()) updateResponseSets();
