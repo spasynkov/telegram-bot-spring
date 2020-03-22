@@ -1,0 +1,98 @@
+body {
+    font-family: 'Open Sans', 'Helvetica', 'Arial', 'sans-serif';
+    text-align: center;
+    padding: 1.714285714rem 0;
+    color: #444;
+}
+
+form {
+    margin: auto;
+    width: 50%;
+}
+
+form input, form textarea {
+    width: 100%;
+    display: block;
+    margin: 8px;
+    resize: none;
+    padding: 0.428571429rem;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+button {
+    padding: 6px 10px;
+    padding: 0.428571429rem 0.714285714rem;
+    font-size: 11px;
+    font-size: 0.785714286rem;
+    line-height: 1.428571429;
+    font-weight: normal;
+    color: #7c7c7c;
+    background-color: #e6e6e6;
+    background-repeat: repeat-x;
+    background-image: -moz-linear-gradient(top, #f4f4f4, #e6e6e6);
+    background-image: -ms-linear-gradient(top, #f4f4f4, #e6e6e6);
+    background-image: -webkit-linear-gradient(top, #f4f4f4, #e6e6e6);
+    background-image: -o-linear-gradient(top, #f4f4f4, #e6e6e6);
+    background-image: linear-gradient(top, #f4f4f4, #e6e6e6);
+    border: 1px solid #d2d2d2;
+    border-radius: 3px;
+    box-shadow: 0 1px 2px rgba(64, 64, 64, 0.1);
+}
+
+button:hover {
+    color: #5e5e5e;
+    background-color: #ebebeb;
+    background-repeat: repeat-x;
+    background-image: -moz-linear-gradient(top, #f9f9f9, #ebebeb);
+    background-image: -ms-linear-gradient(top, #f9f9f9, #ebebeb);
+    background-image: -webkit-linear-gradient(top, #f9f9f9, #ebebeb);
+    background-image: -o-linear-gradient(top, #f9f9f9, #ebebeb);
+    background-image: linear-gradient(top, #f9f9f9, #ebebeb);
+}
+
+#menu-container {
+    border-bottom: 1px solid #ededed;
+    border-top: 1px solid #ededed;
+}
+
+#menu-container a {
+    color: #6a6a6a;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-decoration: none;
+    line-height: 3.692307692;
+    margin: 0 2.857142857rem 0 0;
+}
+
+#menu-container a:hover {
+    color: #000;
+}
+
+#list-container li {
+    list-style: none;
+    display: flex;
+    margin-left: auto;
+    margin-right: auto;
+    width: 60%;
+    border-bottom: 1px solid #ededed !important;
+}
+
+#list-container img {
+    margin: 8px;
+}
+
+#list-container .link {
+    text-align: left;
+    padding: 1% 0 1% 10%;
+    flex-grow: 1;
+    width: 100%;
+}
+
+#list-container .edit {
+    width: fit-content;
+}
+
+#list-container .delete {
+    width: fit-content;
+}
