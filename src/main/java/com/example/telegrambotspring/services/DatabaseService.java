@@ -2,7 +2,6 @@ package com.example.telegrambotspring.services;
 
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.stream.Collector;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -41,14 +40,14 @@ public class DatabaseService {
 	}
 
 	private JSONArray collectToJsonArray(List<SongCouplet> list) {
-		//return new JSONArray(list);
-		return list.parallelStream()
+		return new JSONArray(list);
+		/*return list.parallelStream()
 				.sorted()
 				.map(JSONObject::new)
 				.collect(Collector.of(JSONArray::new,
 						JSONArray::put,
 						JSONArray::put,
-						Collector.Characteristics.CONCURRENT));
+						Collector.Characteristics.CONCURRENT));*/
 	}
 
 	public JSONObject addSong(SongCouplet couplet, String artist, String song) {
