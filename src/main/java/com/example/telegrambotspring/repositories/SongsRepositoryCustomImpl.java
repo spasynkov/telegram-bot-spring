@@ -22,7 +22,7 @@ public class SongsRepositoryCustomImpl<T extends SongCouplet> implements SongsRe
 	public T updateOrInsert(T object) {
 		Query query = new Query();
 		query.addCriteria(Criteria.where("artist").is(object.getArtist()));
-		query.addCriteria(Criteria.where("songName").is(object.getSongName()));
+		query.addCriteria(Criteria.where("song").is(object.getSong()));
 		query.addCriteria(Criteria.where("coupletId").is(object.getCoupletId()));
 
 		Update update = new Update();

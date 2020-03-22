@@ -3,8 +3,8 @@ package com.example.telegrambotspring.services;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.example.telegrambotspring.Utils;
 import com.example.telegrambotspring.entities.SongCouplet;
+import com.example.telegrambotspring.utils.Utils;
 
 public abstract class AbstractResponseService implements ResponseService {
 	protected List<SongCouplet> sets = new LinkedList<>();

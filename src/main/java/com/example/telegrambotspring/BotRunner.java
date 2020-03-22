@@ -18,6 +18,8 @@ import org.springframework.stereotype.Component;
 import com.example.telegrambotspring.entities.Chat;
 import com.example.telegrambotspring.services.ResponseService;
 import com.example.telegrambotspring.services.TelegramBotApiRequestsSender;
+import com.example.telegrambotspring.utils.Pair;
+import com.example.telegrambotspring.utils.Utils;
 
 @Component
 public class BotRunner implements CommandLineRunner {
@@ -36,7 +38,7 @@ public class BotRunner implements CommandLineRunner {
 	private static final String MASTER_GREETINGS = "Слухаю тебе";
 	private final TelegramBotApiRequestsSender requestsSender;
 	private final ResponseService responseService;
-	private final Map<Chat, Utils.Pair<Long, String>> answersForChats = new ConcurrentHashMap<>();
+	private final Map<Chat, Pair<Long, String>> answersForChats = new ConcurrentHashMap<>();
 	private Thread sendResponsesThread;
 
 	private boolean isMasterModeOn = false;
@@ -92,9 +94,9 @@ public class BotRunner implements CommandLineRunner {
 	}
 
 	private void sendResponses() {
-		Iterator<Map.Entry<Chat, Utils.Pair<Long, String>>> iterator = answersForChats.entrySet().iterator();
+		Iterator<Map.Entry<Chat, Pair<Long, String>>> iterator = answersForChats.entrySet().iterator();
 		while (iterator.hasNext()) {
-			Map.Entry<Chat, Utils.Pair<Long, String>> entry = iterator.next();
+			Map.Entry<Chat, Pair<Long, String>> entry = iterator.next();
 			int chatId = entry.getKey().getChatId();
 			long lastMessageTime = entry.getValue().getFirst();
 			String preparedResponse = entry.getValue().getSecond();
@@ -252,7 +254,7 @@ public class BotRunner implements CommandLineRunner {
 			JSONObject chat = message.getJSONObject("chat");
 			int chatId = chat.getInt("id");
 			String type = chat.getString("type");
-			answersForChats.put(new Chat(chatId, "group".equalsIgnoreCase(type)), new Utils.Pair<>(date, response));
+			answersForChats.put(new Chat(chatId, "group".equalsIgnoreCase(type)), new Pair<>(date, response));
 		}
 	}
 }
