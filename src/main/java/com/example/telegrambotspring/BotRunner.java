@@ -63,12 +63,12 @@ public class BotRunner implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 		initSendResponsesThread();
-		while (!isStopNeeded) {
+		/*while (!isStopNeeded) {
 			List<JSONObject> updates = getUpdates();
 
 			processUpdates(updates);
 			TimeUnit.MILLISECONDS.sleep(LATENCY_BETWEEN_GETTING_UPDATES);
-		}
+		}*/
 	}
 
 	private void initSendResponsesThread() {
