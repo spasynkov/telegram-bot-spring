@@ -20,13 +20,27 @@ public class TelegramWebhooksService {
 		this.responseService = responseService;
 	}
 
-	public JSONObject proceedTelegramApiWebhook(String botToken, String jsonString) {
+	public String proceedTelegramApiWebhook(String botToken, String jsonString) {
+		LOGGER.info("Got request: " + jsonString);
+
 		if (!this.botToken.equals(botToken)) {
 			String errorText = "Unknown bot token";
 			LOGGER.debug(errorText);
-			return new JSONObject("{\"error\": \"" + errorText + "\"}");
+			return "{\"error\": \"" + errorText + "\"}";
 		}
 
-		return new JSONObject("{\"status\": \"ok\"}");
+		JSONObject message = new JSONObject(jsonString).getJSONObject("message");
+		int chatId = message.getJSONObject("chat").getInt("id");
+		String text = message.getString("text");
+
+		try {
+			responseService.getResponse(text);
+		} catch (Exception e) {
+			String errorText = "Unable to find suitable response";
+			LOGGER.debug(errorText, e);
+			return "{\"error\": \"" + errorText + "\"}";
+		}
+
+		return "{\"status\": \"ok\"}";
 	}
 }
