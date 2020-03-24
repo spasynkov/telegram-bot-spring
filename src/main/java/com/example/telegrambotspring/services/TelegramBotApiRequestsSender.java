@@ -27,7 +27,7 @@ public class TelegramBotApiRequestsSender {
 	private String token;
 	private String apiUrl = "https://api.telegram.org/bot";
 
-	@Value("${telegram.bot.timeout}")
+	@Value("${telegram.bot.longPoolingTimeout}")
 	private String apiTimeout;
 
 	private AtomicLong offset = new AtomicLong(0);
