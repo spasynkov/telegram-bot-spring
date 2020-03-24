@@ -1,11 +1,17 @@
 package com.example.telegrambotspring.services;
 
+import java.util.Map;
+
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import com.example.telegrambotspring.entities.Chat;
+import com.example.telegrambotspring.utils.Pair;
 
 @Service
 public class TelegramWebhooksService {
@@ -14,10 +20,12 @@ public class TelegramWebhooksService {
 	@Value("${telegram.bot.token}")
 	private String botToken;
 	private ResponseService responseService;
+	private Map<Chat, Pair<Long, String>> answersForChats;
 
 	@Autowired
-	public TelegramWebhooksService(ResponseService responseService) {
+	public TelegramWebhooksService(ResponseService responseService, @Qualifier("answersForChats") Map<Chat, Pair<Long, String>> answersForChats) {
 		this.responseService = responseService;
+		this.answersForChats = answersForChats;
 	}
 
 	public String proceedTelegramApiWebhook(String botToken, String jsonString) {
@@ -30,16 +38,23 @@ public class TelegramWebhooksService {
 		}
 
 		JSONObject message = new JSONObject(jsonString).getJSONObject("message");
-		int chatId = message.getJSONObject("chat").getInt("id");
 		String text = message.getString("text");
+		long date = message.getLong("date");
 
+		JSONObject chat = message.getJSONObject("chat");
+		int chatId = chat.getInt("id");
+		String chatType = chat.getString("type");
+
+		String response;
 		try {
-			responseService.getResponse(text);
+			response = responseService.getResponse(text);
 		} catch (Exception e) {
 			String errorText = "Unable to find suitable response";
 			LOGGER.debug(errorText, e);
 			return "{\"error\": \"" + errorText + "\"}";
 		}
+
+		answersForChats.put(new Chat(chatId, chatType), new Pair<>(date, response));
 
 		return "{\"status\": \"ok\"}";
 	}
