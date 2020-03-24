@@ -11,6 +11,11 @@ public class Chat {
 		this.isGroup = isGroup;
 	}
 
+	public Chat(int chatId, String type) {
+		this.chatId = chatId;
+		this.isGroup = "group".equalsIgnoreCase(type);
+	}
+
 	public int getChatId() {
 		return chatId;
 	}

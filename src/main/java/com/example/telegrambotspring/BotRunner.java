@@ -254,7 +254,7 @@ public class BotRunner implements CommandLineRunner {
 			JSONObject chat = message.getJSONObject("chat");
 			int chatId = chat.getInt("id");
 			String type = chat.getString("type");
-			answersForChats.put(new Chat(chatId, "group".equalsIgnoreCase(type)), new Pair<>(date, response));
+			answersForChats.put(new Chat(chatId, type), new Pair<>(date, response));
 		}
 	}
 }
