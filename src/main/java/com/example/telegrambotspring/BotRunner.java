@@ -1,11 +1,9 @@
 package com.example.telegrambotspring;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -25,11 +23,7 @@ import com.example.telegrambotspring.utils.Utils;
 public class BotRunner implements CommandLineRunner {
 	private static final Logger LOGGER = LoggerFactory.getLogger(BotRunner.class);
 	private static final int _1_MINUTE = 60 * 1000;
-	private static final int _3_SECONDS = 3 * 1000;
-	private static final int _5_SECONDS = 5 * 1000;
-	private static final int MIN_LATENCY_BEFORE_SENDING_MESSAGE_IN_GROUP = _5_SECONDS;//_1_MINUTE;
-	private static final int MIN_LATENCY_BEFORE_SENDING_MESSAGE_IN_PRIVATE = _3_SECONDS;
-	private static final int LATENCY_BETWEEN_GETTING_UPDATES = _5_SECONDS;
+
 	private static final String ADD_SONG = "Запам'ятай пісню";
 	private static final String WRITING_SONG = "Записую...";
 	private static final String FORGET_ME = "Забудь мене";
@@ -39,12 +33,9 @@ public class BotRunner implements CommandLineRunner {
 	private final TelegramBotApiRequestsSender requestsSender;
 	private final ResponseService responseService;
 	private final Map<Chat, Pair<Long, String>> answersForChats = new ConcurrentHashMap<>();
-	private Thread sendResponsesThread;
 
 	private boolean isMasterModeOn = false;
 	private boolean isAddSongOn = false;
-
-	private boolean isStopNeeded = false;
 
 	@Autowired
 	public BotRunner(TelegramBotApiRequestsSender requestsSender, ResponseService responseService) {
@@ -52,68 +43,14 @@ public class BotRunner implements CommandLineRunner {
 		this.responseService = responseService;
 	}
 
-	public void stop() {
-		isStopNeeded = true;
-
-		if (sendResponsesThread != null) {
-			sendResponsesThread.interrupt();
-		}
-	}
-
 	@Override
 	public void run(String... args) throws Exception {
-		initSendResponsesThread();
-		while (!isStopNeeded) {
+		/*while (!isStopNeeded) {
 			List<JSONObject> updates = getUpdates();
 
 			processUpdates(updates);
 			TimeUnit.MILLISECONDS.sleep(LATENCY_BETWEEN_GETTING_UPDATES);
-		}
-	}
-
-	private void initSendResponsesThread() {
-		if (sendResponsesThread == null) {
-			Runnable r = () -> {
-				try {
-					while (!Thread.currentThread().isInterrupted()) {
-						sendResponses();
-
-						TimeUnit.MILLISECONDS.sleep(Math.min(
-								MIN_LATENCY_BEFORE_SENDING_MESSAGE_IN_GROUP,
-								MIN_LATENCY_BEFORE_SENDING_MESSAGE_IN_PRIVATE));
-					}
-				} catch (Exception e) {
-					Thread.currentThread().interrupt();
-					LOGGER.debug("Exception occurred while sending responses");
-				}
-			};
-
-			sendResponsesThread = new Thread(r);
-			sendResponsesThread.start();
-		}
-	}
-
-	private void sendResponses() {
-		Iterator<Map.Entry<Chat, Pair<Long, String>>> iterator = answersForChats.entrySet().iterator();
-		while (iterator.hasNext()) {
-			Map.Entry<Chat, Pair<Long, String>> entry = iterator.next();
-			int chatId = entry.getKey().getChatId();
-			long lastMessageTime = entry.getValue().getFirst();
-			String preparedResponse = entry.getValue().getSecond();
-
-			long latency = entry.getKey().isGroup()
-					? MIN_LATENCY_BEFORE_SENDING_MESSAGE_IN_GROUP
-					: MIN_LATENCY_BEFORE_SENDING_MESSAGE_IN_PRIVATE;
-
-			if (lastMessageTime * 1000 < System.currentTimeMillis() - latency) {
-				try {
-					requestsSender.sendMessage(chatId, preparedResponse);
-					iterator.remove();
-				} catch (Exception e) {
-					LOGGER.error("Unable to send response or delete chat from map", e);
-				}
-			}
-		}
+		}*/
 	}
 
 	private List<JSONObject> getUpdates() throws Exception {
@@ -254,7 +191,7 @@ public class BotRunner implements CommandLineRunner {
 			JSONObject chat = message.getJSONObject("chat");
 			int chatId = chat.getInt("id");
 			String type = chat.getString("type");
-			answersForChats.put(new Chat(chatId, "group".equalsIgnoreCase(type)), new Pair<>(date, response));
+			answersForChats.put(new Chat(chatId, type), new Pair<>(date, response));
 		}
 	}
 }
