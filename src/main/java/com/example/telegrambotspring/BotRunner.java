@@ -1,6 +1,7 @@
 package com.example.telegrambotspring;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -40,7 +41,16 @@ public class BotRunner implements CommandLineRunner {
 		boolean anyALiveBot = true;
 		while (anyALiveBot) {
 			anyALiveBot = false;    // starting new iterations with default false
-			for (Bot bot : bots) {
+			Iterator<Bot> iterator = bots.iterator();
+			while (iterator.hasNext()) {
+				Bot bot = iterator.next();
+
+				// remove all bots with not long pooling updates strategy
+				if (bot.getStrategy() != Bot.UpdatesStrategy.LONG_POOLING) {
+					iterator.remove();
+					continue;
+				}
+
 				if (bot.isAlive()) {
 					anyALiveBot = true;
 					sleepIfNeeded(bot);

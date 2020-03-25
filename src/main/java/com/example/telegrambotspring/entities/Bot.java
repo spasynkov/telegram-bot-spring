@@ -29,12 +29,15 @@ public class Bot {
 	private String token;
 	private AtomicLong offset = new AtomicLong(0);
 	private long lastUpdateTime;
+	private UpdatesStrategy strategy;
+
 	private boolean isMasterModeOn = false;
 	private boolean isAddSongOn = false;
 
-	public Bot(String token, Map<Chat, Pair<Long, String>> answersForChats) {
+	public Bot(String token, Map<Chat, Pair<Long, String>> answersForChats, UpdatesStrategy strategy) {
 		this.token = token;
 		this.answersForChats = answersForChats;
+		this.strategy = strategy;
 	}
 
 	public String getToken() {
@@ -43,6 +46,14 @@ public class Bot {
 
 	public AtomicLong getOffset() {
 		return offset;
+	}
+
+	public long getLastUpdateTime() {
+		return lastUpdateTime;
+	}
+
+	public UpdatesStrategy getStrategy() {
+		return strategy;
 	}
 
 	public List<JSONObject> getUpdates(TelegramBotApiRequestsSender requestsSender) throws Exception {
@@ -192,7 +203,8 @@ public class Bot {
 		return true;
 	}
 
-	public long getLastUpdateTime() {
-		return lastUpdateTime;
+	public enum UpdatesStrategy {
+		LONG_POOLING,
+		WEBHOOKS
 	}
 }

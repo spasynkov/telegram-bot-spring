@@ -25,6 +25,6 @@ public class TelegramBotSpringApplication {
 
 	@Bean
 	public Bot songsBot(@Value("${telegram.bot.token}") String token, Map<Chat, Pair<Long, String>> answersForChats) {
-		return new Bot(token, answersForChats);
+		return new Bot(token, answersForChats, Bot.UpdatesStrategy.LONG_POOLING);
 	}
 }
