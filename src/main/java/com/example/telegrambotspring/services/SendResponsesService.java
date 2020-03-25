@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
+import com.example.telegrambotspring.entities.Bot;
 import com.example.telegrambotspring.entities.Chat;
 import com.example.telegrambotspring.utils.Pair;
 
@@ -31,6 +32,7 @@ public class SendResponsesService {
 
 	@Autowired
 	public SendResponsesService(@Qualifier("answersForChats") Map<Chat, Pair<Long, String>> answersForChats,
+	                            Bot bot,    // TODO: hardcoded bot instance. rewrite with chat response object
 	                            TelegramBotApiRequestsSender requestsSender, ThreadPoolTaskExecutor executor) {
 
 		this.answersForChats = answersForChats;
@@ -39,7 +41,7 @@ public class SendResponsesService {
 		Runnable runnable = () -> {
 			try {
 				while (!Thread.currentThread().isInterrupted()) {
-					sendResponses();
+					sendResponses(bot);
 
 					TimeUnit.MILLISECONDS.sleep(Math.min(
 							sendMessageLatencyGroup,
@@ -53,7 +55,7 @@ public class SendResponsesService {
 		executor.execute(runnable);
 	}
 
-	private void sendResponses() {
+	private void sendResponses(Bot bot) {
 		Iterator<Map.Entry<Chat, Pair<Long, String>>> iterator = answersForChats.entrySet().iterator();
 		while (iterator.hasNext()) {
 			Map.Entry<Chat, Pair<Long, String>> entry = iterator.next();
@@ -67,7 +69,7 @@ public class SendResponsesService {
 
 			if (lastMessageTime * SECONDS_TO_MILLISECONDS_MULTIPLIER < System.currentTimeMillis() - latency) {
 				try {
-					requestsSender.sendMessage(chatId, preparedResponse);
+					requestsSender.sendMessage(bot, chatId, preparedResponse);
 					iterator.remove();
 				} catch (Exception e) {
 					LOGGER.error("Unable to send response or delete chat from map", e);
