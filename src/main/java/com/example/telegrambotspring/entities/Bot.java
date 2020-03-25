@@ -3,6 +3,7 @@ package com.example.telegrambotspring.entities;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.json.JSONArray;
@@ -54,6 +55,37 @@ public class Bot {
 
 	public UpdatesStrategy getStrategy() {
 		return strategy;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Bot bot = (Bot) o;
+		return lastUpdateTime == bot.lastUpdateTime &&
+				isMasterModeOn == bot.isMasterModeOn &&
+				isAddSongOn == bot.isAddSongOn &&
+				Objects.equals(answersForChats, bot.answersForChats) &&
+				Objects.equals(token, bot.token) &&
+				Objects.equals(offset, bot.offset) &&
+				strategy == bot.strategy;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(answersForChats, token, offset, lastUpdateTime, strategy, isMasterModeOn, isAddSongOn);
+	}
+
+	@Override
+	public String toString() {
+		return "Bot{" +
+				"token='" + token + '\'' +
+				", offset=" + offset +
+				", lastUpdateTime=" + lastUpdateTime +
+				", strategy=" + strategy +
+				(isMasterModeOn ? ", isMasterModeOn=true" : "") +
+				(isAddSongOn ? ", isAddSongOn=true" : "") +
+				'}';
 	}
 
 	public List<JSONObject> getUpdates(TelegramBotApiRequestsSender requestsSender) throws Exception {
