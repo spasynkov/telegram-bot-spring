@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -19,59 +18,54 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.example.telegrambotspring.entities.bots.AbstractTelegramBot;
+
 @Service
 public class TelegramBotApiRequestsSender {
 	private static final Logger LOGGER = LoggerFactory.getLogger(TelegramBotApiRequestsSender.class);
 
-	@Value("${telegram.bot.token}")
-	private String token;
 	private String apiUrl = "https://api.telegram.org/bot";
 
 	@Value("${telegram.bot.longPoolingTimeout}")
 	private String apiTimeout;
 
-	private AtomicLong offset = new AtomicLong(0);
-
-	public void setOffset(long offset) {
-		this.offset.set(offset);
+	private String getRequestUrl(AbstractTelegramBot bot) {
+		return apiUrl + bot.getToken() + "/";
 	}
 
-	private String getRequestUrl() {
-		return apiUrl + token + "/";
+	public JSONObject getMe(AbstractTelegramBot bot) throws Exception {
+		return (JSONObject) sendGet(bot, "getMe");
 	}
 
-	public JSONObject getMe() throws Exception {
-		return (JSONObject) sendGet("getMe");
+	public JSONObject sendMessage(AbstractTelegramBot bot, int chatId, String text) throws Exception {
+		return (JSONObject) sendGet(bot, "sendMessage?chat_id=" + chatId + "&text=" + URLEncoder.encode(text, "UTF-8"));
 	}
 
-	public JSONObject sendMessage(int chatId, String text) throws Exception {
-		return (JSONObject) sendGet("sendMessage?chat_id=" + chatId + "&text=" + URLEncoder.encode(text, "UTF-8"));
-	}
-
-	public JSONObject sendMessage(int chatId, String text, JSONObject keyboardMarkup) throws Exception {
+	public JSONObject sendMessage(AbstractTelegramBot bot, int chatId, String text, JSONObject keyboardMarkup) throws Exception {
 		JSONObject json = new JSONObject();
 		json.put("chat_id", chatId);
 		json.put("text", text);
 		json.put("reply_markup", keyboardMarkup);
-		return (JSONObject) sendPost("sendMessage", json);
+		return (JSONObject) sendPost(bot, "sendMessage", json);
 	}
 
-	public JSONArray getUpdates() throws Exception {
-		return (JSONArray) sendGet(String.format("getUpdates?%s&timeout=%s&allowed_updates=%%5B%%22message%%22%%5D",
-				offset.get() != 0 ? "offset=" + (offset.get() + 1) : "",
-				apiTimeout));
+	public JSONArray getUpdates(AbstractTelegramBot bot) throws Exception {
+		return (JSONArray) sendGet(bot,
+				String.format("getUpdates?%s&timeout=%s&allowed_updates=%%5B%%22message%%22%%5D",
+						bot.getOffset().get() != 0 ? "offset=" + (bot.getOffset().get() + 1) : "",
+						apiTimeout));
 	}
 
-	public JSONObject getChat(String chatName) throws Exception {
-		return (JSONObject) sendGet("getChat?chat_id=@" + chatName);
+	public JSONObject getChat(AbstractTelegramBot bot, String chatName) throws Exception {
+		return (JSONObject) sendGet(bot, "getChat?chat_id=@" + chatName);
 	}
 
-	public JSONObject getChat(int chatId) throws Exception {
-		return (JSONObject) sendGet("getChat?chat_id=" + chatId);
+	public JSONObject getChat(AbstractTelegramBot bot, int chatId) throws Exception {
+		return (JSONObject) sendGet(bot, "getChat?chat_id=" + chatId);
 	}
 
-	private Object sendPost(String methodName, JSONObject json) throws Exception {
-		final String requestUrl = getRequestUrl() + methodName;
+	private Object sendPost(AbstractTelegramBot bot, String methodName, JSONObject json) throws Exception {
+		final String requestUrl = getRequestUrl(bot) + methodName;
 
 		LOGGER.info("sending request at: " + requestUrl);
 
@@ -85,8 +79,8 @@ public class TelegramBotApiRequestsSender {
 		return parseResponse(resp, requestUrl);
 	}
 
-	private Object sendGet(String methodNameAndUrlParams) throws Exception {
-		final String requestUrl = getRequestUrl() + methodNameAndUrlParams;
+	private Object sendGet(AbstractTelegramBot bot, String methodNameAndUrlParams) throws Exception {
+		final String requestUrl = getRequestUrl(bot) + methodNameAndUrlParams;
 
 		LOGGER.info("sending request at: " + requestUrl);
 
