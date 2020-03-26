@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.example.telegrambotspring.entities.Bot;
+import com.example.telegrambotspring.entities.bots.AbstractTelegramBot;
 
 @Service
 public class TelegramBotApiRequestsSender {
@@ -29,19 +29,19 @@ public class TelegramBotApiRequestsSender {
 	@Value("${telegram.bot.longPoolingTimeout}")
 	private String apiTimeout;
 
-	private String getRequestUrl(Bot bot) {
+	private String getRequestUrl(AbstractTelegramBot bot) {
 		return apiUrl + bot.getToken() + "/";
 	}
 
-	public JSONObject getMe(Bot bot) throws Exception {
+	public JSONObject getMe(AbstractTelegramBot bot) throws Exception {
 		return (JSONObject) sendGet(bot, "getMe");
 	}
 
-	public JSONObject sendMessage(Bot bot, int chatId, String text) throws Exception {
+	public JSONObject sendMessage(AbstractTelegramBot bot, int chatId, String text) throws Exception {
 		return (JSONObject) sendGet(bot, "sendMessage?chat_id=" + chatId + "&text=" + URLEncoder.encode(text, "UTF-8"));
 	}
 
-	public JSONObject sendMessage(Bot bot, int chatId, String text, JSONObject keyboardMarkup) throws Exception {
+	public JSONObject sendMessage(AbstractTelegramBot bot, int chatId, String text, JSONObject keyboardMarkup) throws Exception {
 		JSONObject json = new JSONObject();
 		json.put("chat_id", chatId);
 		json.put("text", text);
@@ -49,22 +49,22 @@ public class TelegramBotApiRequestsSender {
 		return (JSONObject) sendPost(bot, "sendMessage", json);
 	}
 
-	public JSONArray getUpdates(Bot bot) throws Exception {
+	public JSONArray getUpdates(AbstractTelegramBot bot) throws Exception {
 		return (JSONArray) sendGet(bot,
 				String.format("getUpdates?%s&timeout=%s&allowed_updates=%%5B%%22message%%22%%5D",
 						bot.getOffset().get() != 0 ? "offset=" + (bot.getOffset().get() + 1) : "",
 						apiTimeout));
 	}
 
-	public JSONObject getChat(Bot bot, String chatName) throws Exception {
+	public JSONObject getChat(AbstractTelegramBot bot, String chatName) throws Exception {
 		return (JSONObject) sendGet(bot, "getChat?chat_id=@" + chatName);
 	}
 
-	public JSONObject getChat(Bot bot, int chatId) throws Exception {
+	public JSONObject getChat(AbstractTelegramBot bot, int chatId) throws Exception {
 		return (JSONObject) sendGet(bot, "getChat?chat_id=" + chatId);
 	}
 
-	private Object sendPost(Bot bot, String methodName, JSONObject json) throws Exception {
+	private Object sendPost(AbstractTelegramBot bot, String methodName, JSONObject json) throws Exception {
 		final String requestUrl = getRequestUrl(bot) + methodName;
 
 		LOGGER.info("sending request at: " + requestUrl);
@@ -79,7 +79,7 @@ public class TelegramBotApiRequestsSender {
 		return parseResponse(resp, requestUrl);
 	}
 
-	private Object sendGet(Bot bot, String methodNameAndUrlParams) throws Exception {
+	private Object sendGet(AbstractTelegramBot bot, String methodNameAndUrlParams) throws Exception {
 		final String requestUrl = getRequestUrl(bot) + methodNameAndUrlParams;
 
 		LOGGER.info("sending request at: " + requestUrl);

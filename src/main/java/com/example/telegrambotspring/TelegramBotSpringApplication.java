@@ -8,8 +8,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
-import com.example.telegrambotspring.entities.Bot;
 import com.example.telegrambotspring.entities.Chat;
+import com.example.telegrambotspring.entities.bots.SongsBot;
 import com.example.telegrambotspring.utils.Pair;
 
 @SpringBootApplication
@@ -24,7 +24,7 @@ public class TelegramBotSpringApplication {
 	}
 
 	@Bean
-	public Bot songsBot(@Value("${telegram.bot.token}") String token, Map<Chat, Pair<Long, String>> answersForChats) {
-		return new Bot(token, answersForChats, Bot.UpdatesStrategy.LONG_POOLING);
+	public SongsBot songsBot(@Value("${telegram.bot.token}") String token, Map<Chat, Pair<Long, String>> answersForChats) {
+		return new SongsBot(token, answersForChats, SongsBot.UpdatesStrategy.WEBHOOKS);
 	}
 }

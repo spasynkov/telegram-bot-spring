@@ -1,23 +1,23 @@
-package com.example.telegrambotspring.entities;
+package com.example.telegrambotspring.entities.bots;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.example.telegrambotspring.entities.Chat;
 import com.example.telegrambotspring.services.ResponseService;
 import com.example.telegrambotspring.services.TelegramBotApiRequestsSender;
 import com.example.telegrambotspring.utils.Pair;
 import com.example.telegrambotspring.utils.Utils;
 
-public class Bot {
-	private static final Logger LOGGER = LoggerFactory.getLogger(Bot.class);
+public class SongsBot extends AbstractTelegramBot {
+	private static final Logger LOGGER = LoggerFactory.getLogger(SongsBot.class);
 	private static final int _1_MINUTE = 60 * 1000;
 
 	private static final String ADD_SONG = "Запам'ятай пісню";
@@ -26,42 +26,19 @@ public class Bot {
 	private static final String START = "/start";
 	private static final String GREETINGS = "привіт)\nдавай поспіваємо";
 	private static final String MASTER_GREETINGS = "Слухаю тебе";
-	private final Map<Chat, Pair<Long, String>> answersForChats;
-	private String token;
-	private AtomicLong offset = new AtomicLong(0);
-	private long lastUpdateTime;
-	private UpdatesStrategy strategy;
 
 	private boolean isMasterModeOn = false;
 	private boolean isAddSongOn = false;
 
-	public Bot(String token, Map<Chat, Pair<Long, String>> answersForChats, UpdatesStrategy strategy) {
-		this.token = token;
-		this.answersForChats = answersForChats;
-		this.strategy = strategy;
-	}
-
-	public String getToken() {
-		return token;
-	}
-
-	public AtomicLong getOffset() {
-		return offset;
-	}
-
-	public long getLastUpdateTime() {
-		return lastUpdateTime;
-	}
-
-	public UpdatesStrategy getStrategy() {
-		return strategy;
+	public SongsBot(String token, Map<Chat, Pair<Long, String>> answersForChats, UpdatesStrategy strategy) {
+		super(token, answersForChats, strategy);
 	}
 
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
-		Bot bot = (Bot) o;
+		SongsBot bot = (SongsBot) o;
 		return lastUpdateTime == bot.lastUpdateTime &&
 				isMasterModeOn == bot.isMasterModeOn &&
 				isAddSongOn == bot.isAddSongOn &&
@@ -78,7 +55,7 @@ public class Bot {
 
 	@Override
 	public String toString() {
-		return "Bot{" +
+		return "SongsBot{" +
 				"token='" + token + '\'' +
 				", offset=" + offset +
 				", lastUpdateTime=" + lastUpdateTime +
@@ -88,59 +65,8 @@ public class Bot {
 				'}';
 	}
 
-	public List<JSONObject> getUpdates(TelegramBotApiRequestsSender requestsSender) throws Exception {
-		JSONArray updates = requestsSender.getUpdates(this);
-		lastUpdateTime = System.currentTimeMillis();
-
-		List<JSONObject> result = new LinkedList<>();
-		for (Object o : updates) {
-			if (!(o instanceof JSONObject)) {
-				LOGGER.debug(o + " is not JSONObject");
-				continue;
-			}
-			result.add((JSONObject) o);
-		}
-
-		return result;
-	}
-
-	public void processUpdates(ResponseService responseService, TelegramBotApiRequestsSender requestsSender, List<JSONObject> updates) {
-		for (JSONObject update : updates) {
-			String chatType = update.optJSONObject("message")
-					.optJSONObject("chat")
-					.optString("type", "");
-
-			if (chatType.isEmpty()) {
-				LOGGER.debug("Unable to get chat type: " + update);
-				continue;
-			}
-
-			boolean processed = true;
-
-			if ("private".equalsIgnoreCase(chatType)) {
-				try {
-					processDirectMessage(requestsSender, update);
-				} catch (Exception e) {
-					processed = false;
-					LOGGER.error("Unable to process direct message", e);
-				}
-			} else {
-				try {
-					processGroupMessage(responseService, update);
-				} catch (Exception e) {
-					processed = false;
-					LOGGER.error("Unable to process group message", e);
-				}
-			}
-
-			if (processed) {
-				long update_id = update.getLong("update_id");
-				offset = new AtomicLong(update_id);
-			}
-		}
-	}
-
-	private void processDirectMessage(TelegramBotApiRequestsSender requestsSender, JSONObject update) throws Exception {
+	@Override
+	protected void processDirectMessage(TelegramBotApiRequestsSender requestsSender, JSONObject update) throws Exception {
 		JSONObject message = update.getJSONObject("message");
 		String text = message.getString("text");
 		int chatId = message.getJSONObject("chat").getInt("id");
@@ -207,7 +133,7 @@ public class Bot {
 		requestsSender.sendMessage(this, chatId, "Not implemented yet!");
 	}
 
-	private void processGroupMessage(ResponseService responseService, JSONObject update) {
+	protected void processGroupMessage(ResponseService responseService, JSONObject update) {
 		JSONObject message = update.getJSONObject("message");
 
 		long date = message.getLong("date");
@@ -229,14 +155,5 @@ public class Bot {
 			String type = chat.getString("type");
 			answersForChats.put(new Chat(chatId, type), new Pair<>(date, response));
 		}
-	}
-
-	public boolean isAlive() {
-		return true;
-	}
-
-	public enum UpdatesStrategy {
-		LONG_POOLING,
-		WEBHOOKS
 	}
 }
