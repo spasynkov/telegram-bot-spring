@@ -1,4 +1,4 @@
-package com.example.telegrambotspring.entities.bots;
+package com.example.telegrambotspring.entities;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -10,7 +10,6 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.example.telegrambotspring.entities.Chat;
 import com.example.telegrambotspring.services.ResponseService;
 import com.example.telegrambotspring.services.TelegramBotApiRequestsSender;
 import com.example.telegrambotspring.utils.Pair;

@@ -11,43 +11,41 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.stereotype.Component;
 
-import com.example.telegrambotspring.entities.bots.SongsBot;
+import com.example.telegrambotspring.entities.AbstractTelegramBot;
 import com.example.telegrambotspring.services.ResponseService;
 import com.example.telegrambotspring.services.TelegramBotApiRequestsSender;
 
-@Component
-public class BotRunner implements CommandLineRunner {
+
+public class BotRunner  {
 	private static final Logger LOGGER = LoggerFactory.getLogger(BotRunner.class);
 
 	private final TaskExecutor executor;
 	private final TelegramBotApiRequestsSender requestsSender;
 	private final ResponseService responseService;
-	private final List<SongsBot> bots;
+	private final List<AbstractTelegramBot> bots;
 
 	@Value("${app.getting-updates-latency}")
 	private long latencyBetweenGettingUpdates;
 
 	@Autowired
-	public BotRunner(ThreadPoolTaskExecutor executor, TelegramBotApiRequestsSender requestsSender, ResponseService responseService, SongsBot... bots) {
+	public BotRunner(ThreadPoolTaskExecutor executor, TelegramBotApiRequestsSender requestsSender, ResponseService responseService, AbstractTelegramBot... bots) {
 		this.executor = executor;
 		this.requestsSender = requestsSender;
 		this.responseService = responseService;
 		this.bots = new LinkedList<>(Arrays.asList(bots));
 	}
 
-	@Override
+
 	public void run(String... args) {
-		Iterator<SongsBot> iterator = bots.iterator();
+		Iterator<AbstractTelegramBot> iterator = bots.iterator();
 		while (iterator.hasNext()) {
-			SongsBot bot = iterator.next();
+			AbstractTelegramBot bot = iterator.next();
 
 			// remove all bots with not long pooling updates strategy
-			if (bot.getStrategy() != SongsBot.UpdatesStrategy.LONG_POOLING) {
+			if (bot.getStrategy() != AbstractTelegramBot.UpdatesStrategy.LONG_POOLING) {
 				iterator.remove();
 				continue;
 			}
@@ -74,7 +72,7 @@ public class BotRunner implements CommandLineRunner {
 		}
 	}
 
-	private void sleepIfNeeded(SongsBot bot) throws InterruptedException {
+	private void sleepIfNeeded(AbstractTelegramBot bot) throws InterruptedException {
 		long processingTime = System.currentTimeMillis() - bot.getLastUpdateTime();
 		long sleepTime = latencyBetweenGettingUpdates - processingTime;
 		if (sleepTime > 0) {

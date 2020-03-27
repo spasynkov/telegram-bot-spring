@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.example.telegrambotspring.entities.bots.AbstractTelegramBot;
+import com.example.telegrambotspring.entities.AbstractTelegramBot;
 
 @Service
 public class TelegramBotApiRequestsSender {
