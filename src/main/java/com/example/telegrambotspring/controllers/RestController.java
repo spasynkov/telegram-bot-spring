@@ -1,10 +1,9 @@
 package com.example.telegrambotspring.controllers;
 
+import com.example.telegrambotspring.entities.SongVerse;
+import com.example.telegrambotspring.services.DatabaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import com.example.telegrambotspring.entities.SongCouplet;
-import com.example.telegrambotspring.services.DatabaseService;
 
 @org.springframework.web.bind.annotation.RestController
 @RequestMapping(value = "/rest", produces = "application/json")
@@ -32,17 +31,17 @@ public class RestController {
 	}
 
 	@PutMapping("/all/artist/{artistName}/song/{songName}")
-	public String addSong(@RequestBody SongCouplet couplet, @PathVariable String artistName, @PathVariable String songName) {
-		return service.addSong(couplet, artistName, songName).toString();
+	public String addSong(@RequestBody SongVerse verse, @PathVariable String artistName, @PathVariable String songName) {
+		return service.addSong(verse, artistName, songName).toString();
 	}
 
 	@PostMapping("/all/artist/{artistName}/song/{songName}")
-	public String editSong(@RequestBody SongCouplet couplet, @PathVariable String artistName, @PathVariable String songName) {
-		return service.editSong(couplet, artistName, songName).toString();
+	public String editSong(@RequestBody SongVerse verse, @PathVariable String artistName, @PathVariable String songName) {
+		return service.editSong(verse, artistName, songName).toString();
 	}
 
 	@DeleteMapping("/all/artist/{artistName}/song/{songName}")
-	public String deleteSong(@RequestBody SongCouplet couplet, @PathVariable String artistName, @PathVariable String songName) {
-		return service.deleteSong(couplet, artistName, songName).toString();
+	public String deleteSong(@RequestBody SongVerse verset, @PathVariable String artistName, @PathVariable String songName) {
+		return service.deleteSong(verset, artistName, songName).toString();
 	}
 }

@@ -1,5 +1,6 @@
 package com.example.telegrambotspring.repositories;
 
+import com.example.telegrambotspring.entities.SongVerse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -7,10 +8,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
-import com.example.telegrambotspring.entities.SongCouplet;
-
 @Repository
-public class SongsRepositoryCustomImpl<T extends SongCouplet> implements SongsRepositoryCustom<T> {
+public class SongsRepositoryCustomImpl<T extends SongVerse> implements SongsRepositoryCustom<T> {
 	private final MongoTemplate mongoTemplate;
 
 	@Autowired
@@ -23,7 +22,7 @@ public class SongsRepositoryCustomImpl<T extends SongCouplet> implements SongsRe
 		Query query = new Query();
 		query.addCriteria(Criteria.where("artist").is(object.getArtist()));
 		query.addCriteria(Criteria.where("song").is(object.getSong()));
-		query.addCriteria(Criteria.where("coupletId").is(object.getCoupletId()));
+		query.addCriteria(Criteria.where("versetId").is(object.getVerseId()));
 
 		Update update = new Update();
 		update.set("text", object.getText());

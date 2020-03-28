@@ -1,20 +1,20 @@
 package com.example.telegrambotspring.services;
 
+import com.example.telegrambotspring.entities.SongVerse;
+import com.example.telegrambotspring.utils.Utils;
+
 import java.util.LinkedList;
 import java.util.List;
 
-import com.example.telegrambotspring.entities.SongCouplet;
-import com.example.telegrambotspring.utils.Utils;
-
 public abstract class AbstractResponseService implements ResponseService {
-	protected List<SongCouplet> sets = new LinkedList<>();
+	protected List<SongVerse> sets = new LinkedList<>();
 
 	@Override
 	public String getResponse(String... textParts) throws Exception {
-		if (sets.isEmpty()) updateSongCouplets(null);
+		if (sets.isEmpty()) updateSongVerses(null);
 
-		SongCouplet foundSet = null;
-		for (SongCouplet set : sets) {
+		SongVerse foundSet = null;
+		for (SongVerse set : sets) {
 			List<String> strings = set.getText();
 			for (int i = 0; i < strings.size(); i++) {
 				if (Utils.normalizeString(strings.get(i)).equalsIgnoreCase(Utils.normalizeString(textParts[0]))

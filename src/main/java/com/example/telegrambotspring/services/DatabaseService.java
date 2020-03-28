@@ -1,8 +1,7 @@
 package com.example.telegrambotspring.services;
 
-import java.util.List;
-import java.util.concurrent.Callable;
-
+import com.example.telegrambotspring.entities.SongVerse;
+import com.example.telegrambotspring.repositories.SongsRepository;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -10,8 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.example.telegrambotspring.entities.SongCouplet;
-import com.example.telegrambotspring.repositories.SongsRepository;
+import java.util.List;
+import java.util.concurrent.Callable;
 
 @Service
 public class DatabaseService {
@@ -25,21 +24,21 @@ public class DatabaseService {
 	}
 
 	public JSONArray getAll() {
-		List<SongCouplet> list = repository.findAll();
+		List<SongVerse> list = repository.findAll();
 		return collectToJsonArray(list);
 	}
 
 	public JSONArray getAllByArtist(String artist) {
-		List<SongCouplet> list = repository.findAllByArtist(artist);
+		List<SongVerse> list = repository.findAllByArtist(artist);
 		return collectToJsonArray(list);
 	}
 
 	public JSONArray getAllByArtistAndSong(String artist, String song) {
-		List<SongCouplet> list = repository.findAllByArtistAndSong(artist, song);
+		List<SongVerse> list = repository.findAllByArtistAndSong(artist, song);
 		return collectToJsonArray(list);
 	}
 
-	private JSONArray collectToJsonArray(List<SongCouplet> list) {
+	private JSONArray collectToJsonArray(List<SongVerse> list) {
 		return new JSONArray(list);
 		/*return list.parallelStream()
 				.sorted()
@@ -50,26 +49,26 @@ public class DatabaseService {
 						Collector.Characteristics.CONCURRENT));*/
 	}
 
-	public JSONObject addSong(SongCouplet couplet, String artist, String song) {
+	public JSONObject addSong(SongVerse verset, String artist, String song) {
 		return safeCall(() -> {
-			validateData(couplet, artist, song);
-			SongCouplet result = repository.insert(couplet);
+			validateData(verset, artist, song);
+			SongVerse result = repository.insert(verset);
 			return new JSONObject(result);
 		});
 	}
 
-	public JSONObject editSong(SongCouplet couplet, String artist, String song) {
+	public JSONObject editSong(SongVerse verset, String artist, String song) {
 		return safeCall(() -> {
-			validateData(couplet, artist, song);
-			SongCouplet result = repository.updateOrInsert(couplet);
+			validateData(verset, artist, song);
+			SongVerse result = repository.updateOrInsert(verset);
 			return new JSONObject(result);
 		});
 	}
 
-	public JSONObject deleteSong(SongCouplet couplet, String artist, String song) {
+	public JSONObject deleteSong(SongVerse verset, String artist, String song) {
 		return safeCall(() -> {
-			validateData(couplet, artist, song);
-			repository.delete(couplet);
+			validateData(verset, artist, song);
+			repository.delete(verset);
 			return new JSONObject();
 		});
 	}
@@ -86,12 +85,12 @@ public class DatabaseService {
 		}
 	}
 
-	private void validateData(SongCouplet couplet, String artist, String song) throws Exception {
-		if (!artist.equals(couplet.getArtist())) {
+	private void validateData(SongVerse verset, String artist, String song) throws Exception {
+		if (!artist.equals(verset.getArtist())) {
 			throw new Exception("Incorrect request data: content artist not equals request artist");
 		}
 
-		if (!song.equals(couplet.getSong())) {
+		if (!song.equals(verset.getSong())) {
 			throw new Exception("Incorrect request data: content song not equals request song");
 		}
 	}
