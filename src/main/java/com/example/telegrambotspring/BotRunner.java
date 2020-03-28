@@ -14,12 +14,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.stereotype.Component;
 
 import com.example.telegrambotspring.entities.AbstractTelegramBot;
 import com.example.telegrambotspring.services.ResponseService;
 import com.example.telegrambotspring.services.TelegramBotApiRequestsSender;
 
-
+@Component
 public class BotRunner implements CommandLineRunner {
 	private static final Logger LOGGER = LoggerFactory.getLogger(BotRunner.class);
 
@@ -32,14 +33,18 @@ public class BotRunner implements CommandLineRunner {
 	private long latencyBetweenGettingUpdates;
 
 	@Autowired
-	public BotRunner(ThreadPoolTaskExecutor executor, TelegramBotApiRequestsSender requestsSender, ResponseService responseService, AbstractTelegramBot... bots) {
+	public BotRunner(ThreadPoolTaskExecutor executor,
+	                 TelegramBotApiRequestsSender requestsSender,
+	                 ResponseService responseService,
+	                 AbstractTelegramBot... bots) {
+
 		this.executor = executor;
 		this.requestsSender = requestsSender;
 		this.responseService = responseService;
 		this.bots = new LinkedList<>(Arrays.asList(bots));
 	}
 
-
+	@Override
 	public void run(String... args) {
 		Iterator<AbstractTelegramBot> iterator = bots.iterator();
 		while (iterator.hasNext()) {
