@@ -41,7 +41,7 @@ public class RestController {
 	}
 
 	@DeleteMapping("/all/artist/{artistName}/song/{songName}")
-	public String deleteSong(@RequestBody SongVerse verset, @PathVariable String artistName, @PathVariable String songName) {
-		return service.deleteSong(verset, artistName, songName).toString();
+	public String deleteSong(@RequestBody SongVerse verse, @PathVariable String artistName, @PathVariable String songName) {
+		return service.deleteSong(verse, artistName, songName).toString();
 	}
 }
