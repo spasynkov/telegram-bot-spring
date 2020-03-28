@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
@@ -19,7 +20,7 @@ import com.example.telegrambotspring.services.ResponseService;
 import com.example.telegrambotspring.services.TelegramBotApiRequestsSender;
 
 
-public class BotRunner  {
+public class BotRunner implements CommandLineRunner {
 	private static final Logger LOGGER = LoggerFactory.getLogger(BotRunner.class);
 
 	private final TaskExecutor executor;
