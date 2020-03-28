@@ -22,7 +22,7 @@ public class SongsRepositoryCustomImpl<T extends SongVerse> implements SongsRepo
 		Query query = new Query();
 		query.addCriteria(Criteria.where("artist").is(object.getArtist()));
 		query.addCriteria(Criteria.where("song").is(object.getSong()));
-        query.addCriteria(Criteria.where("verseId").is(object.getVerseId()));
+		query.addCriteria(Criteria.where("verseId").is(object.getVerseId()));
 
 		Update update = new Update();
 		update.set("text", object.getText());

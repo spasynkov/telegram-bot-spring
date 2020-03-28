@@ -49,26 +49,26 @@ public class DatabaseService {
 						Collector.Characteristics.CONCURRENT));*/
 	}
 
-    public JSONObject addSong(SongVerse verse, String artist, String song) {
+	public JSONObject addSong(SongVerse verse, String artist, String song) {
 		return safeCall(() -> {
-            validateData(verse, artist, song);
-            SongVerse result = repository.insert(verse);
+			validateData(verse, artist, song);
+			SongVerse result = repository.insert(verse);
 			return new JSONObject(result);
 		});
 	}
 
-    public JSONObject editSong(SongVerse verse, String artist, String song) {
+	public JSONObject editSong(SongVerse verse, String artist, String song) {
 		return safeCall(() -> {
-            validateData(verse, artist, song);
-            SongVerse result = repository.updateOrInsert(verse);
+			validateData(verse, artist, song);
+			SongVerse result = repository.updateOrInsert(verse);
 			return new JSONObject(result);
 		});
 	}
 
-    public JSONObject deleteSong(SongVerse verse, String artist, String song) {
+	public JSONObject deleteSong(SongVerse verse, String artist, String song) {
 		return safeCall(() -> {
-            validateData(verse, artist, song);
-            repository.delete(verse);
+			validateData(verse, artist, song);
+			repository.delete(verse);
 			return new JSONObject();
 		});
 	}
@@ -85,12 +85,12 @@ public class DatabaseService {
 		}
 	}
 
-    private void validateData(SongVerse verse, String artist, String song) throws Exception {
-        if (!artist.equals(verse.getArtist())) {
+	private void validateData(SongVerse verse, String artist, String song) throws Exception {
+		if (!artist.equals(verse.getArtist())) {
 			throw new Exception("Incorrect request data: content artist not equals request artist");
 		}
 
-        if (!song.equals(verse.getSong())) {
+		if (!song.equals(verse.getSong())) {
 			throw new Exception("Incorrect request data: content song not equals request song");
 		}
 	}
