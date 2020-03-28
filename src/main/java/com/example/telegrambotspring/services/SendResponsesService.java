@@ -13,7 +13,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import com.example.telegrambotspring.entities.Chat;
-import com.example.telegrambotspring.entities.bots.SongsBot;
+import com.example.telegrambotspring.entities.AbstractTelegramBot;
 import com.example.telegrambotspring.utils.Pair;
 
 @Service
@@ -32,7 +32,7 @@ public class SendResponsesService {
 
 	@Autowired
 	public SendResponsesService(@Qualifier("answersForChats") Map<Chat, Pair<Long, String>> answersForChats,
-	                            SongsBot bot,    // TODO: hardcoded bot instance. rewrite with chat response object
+	                            AbstractTelegramBot bot,    // TODO: hardcoded bot instance. rewrite with chat response object
 	                            TelegramBotApiRequestsSender requestsSender, ThreadPoolTaskExecutor executor) {
 
 		this.answersForChats = answersForChats;
@@ -55,7 +55,7 @@ public class SendResponsesService {
 		executor.execute(runnable);
 	}
 
-	private void sendResponses(SongsBot bot) {
+	private void sendResponses(AbstractTelegramBot bot) {
 		Iterator<Map.Entry<Chat, Pair<Long, String>>> iterator = answersForChats.entrySet().iterator();
 		while (iterator.hasNext()) {
 			Map.Entry<Chat, Pair<Long, String>> entry = iterator.next();

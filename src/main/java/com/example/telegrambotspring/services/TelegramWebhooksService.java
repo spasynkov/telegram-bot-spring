@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import com.example.telegrambotspring.entities.Chat;
-import com.example.telegrambotspring.entities.bots.AbstractTelegramBot;
+import com.example.telegrambotspring.entities.AbstractTelegramBot;
 import com.example.telegrambotspring.utils.Pair;
 
 @Service
