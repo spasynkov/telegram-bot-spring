@@ -1,16 +1,15 @@
 package com.example.telegrambotspring.services;
 
+import com.example.telegrambotspring.entities.SongVerse;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-import com.example.telegrambotspring.entities.SongCouplet;
 
 @Service
 @Deprecated
@@ -23,7 +22,7 @@ public class FileBasedResponseService extends AbstractResponseService implements
 	}
 
 	@Override
-	public void updateSongCouplets(String artist) throws Exception {
+	public void updateSongVerses(String artist) throws Exception {
 		try {
 			initFile();
 		} catch (FileNotFoundException e) {
@@ -31,7 +30,7 @@ public class FileBasedResponseService extends AbstractResponseService implements
 		}
 
 		if (file.isFile()) {
-			SongCouplet set = collectDataFromFile(file);
+			SongVerse set = collectDataFromFile(file);
 			if (set != null) sets.add(set);
 		} else if (file.isDirectory()) {
 			File[] files = file.listFiles();
@@ -39,8 +38,8 @@ public class FileBasedResponseService extends AbstractResponseService implements
 
 			for (File file : files) {
 				if (file.isDirectory()) continue;
-				SongCouplet SongCouplet = collectDataFromFile(file);
-				if (SongCouplet != null) sets.add(SongCouplet);
+				SongVerse SongVerse = collectDataFromFile(file);
+				if (SongVerse != null) sets.add(SongVerse);
 			}
 		}
 	}
@@ -52,7 +51,7 @@ public class FileBasedResponseService extends AbstractResponseService implements
 		}
 	}
 
-	private SongCouplet collectDataFromFile(File file) {
+	private SongVerse collectDataFromFile(File file) {
 		List<String> strings = new LinkedList<>();
 
 		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
@@ -63,6 +62,6 @@ public class FileBasedResponseService extends AbstractResponseService implements
 			return null;
 		}
 
-		return new SongCouplet("", "", 0, strings);
+		return new SongVerse("", "", 0, strings);
 	}
 }

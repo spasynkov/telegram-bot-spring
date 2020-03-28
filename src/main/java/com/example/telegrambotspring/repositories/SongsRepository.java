@@ -1,13 +1,12 @@
 package com.example.telegrambotspring.repositories;
 
-import java.util.List;
-
+import com.example.telegrambotspring.entities.SongVerse;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import com.example.telegrambotspring.entities.SongCouplet;
+import java.util.List;
 
-public interface SongsRepository extends MongoRepository<SongCouplet, String>, SongsRepositoryCustom<SongCouplet> {
-	List<SongCouplet> findAllByArtist(String artist);
+public interface SongsRepository extends MongoRepository<SongVerse, String>, SongsRepositoryCustom<SongVerse> {
+	List<SongVerse> findAllByArtist(String artist);
 
-	List<SongCouplet> findAllByArtistAndSong(String artist, String song);
+	List<SongVerse> findAllByArtistAndSong(String artist, String song);
 }
