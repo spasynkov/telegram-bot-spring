@@ -1,6 +1,5 @@
 window.onload = function () {
     let location = window.location.href;
-    console.log(location);
     if (location.toString().includes('/edit.html')) {
         editPage();
     } else if (location.toString().includes('/list.html')) {
