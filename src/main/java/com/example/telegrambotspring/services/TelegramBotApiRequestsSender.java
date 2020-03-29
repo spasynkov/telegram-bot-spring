@@ -1,10 +1,6 @@
 package com.example.telegrambotspring.services;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-
+import com.example.telegrambotspring.entities.bots.AbstractTelegramBot;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -18,7 +14,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.example.telegrambotspring.entities.bots.AbstractTelegramBot;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.Callable;
 
 @Service
 public class TelegramBotApiRequestsSender {
@@ -33,20 +33,22 @@ public class TelegramBotApiRequestsSender {
 		return apiUrl + bot.getToken() + "/";
 	}
 
-	public JSONObject getMe(AbstractTelegramBot bot) throws Exception {
-		return (JSONObject) sendGet(bot, "getMe");
+	public JSONObject getMe(AbstractTelegramBot bot) {
+		return safeCall(() -> (JSONObject) sendGet(bot, "getMe"));
 	}
 
-	public JSONObject sendMessage(AbstractTelegramBot bot, int chatId, String text) throws Exception {
-		return (JSONObject) sendGet(bot, "sendMessage?chat_id=" + chatId + "&text=" + URLEncoder.encode(text, "UTF-8"));
+	public JSONObject sendMessage(AbstractTelegramBot bot, int chatId, String text) {
+		return safeCall(() -> (JSONObject) sendGet(bot, "sendMessage?chat_id=" + chatId + "&text=" + URLEncoder.encode(text, "UTF-8")));
 	}
 
-	public JSONObject sendMessage(AbstractTelegramBot bot, int chatId, String text, JSONObject keyboardMarkup) throws Exception {
-		JSONObject json = new JSONObject();
-		json.put("chat_id", chatId);
-		json.put("text", text);
-		json.put("reply_markup", keyboardMarkup);
-		return (JSONObject) sendPost(bot, "sendMessage", json);
+	public JSONObject sendMessage(AbstractTelegramBot bot, int chatId, String text, JSONObject keyboardMarkup) {
+		return safeCall(() -> {
+			JSONObject json = new JSONObject();
+			json.put("chat_id", chatId);
+			json.put("text", text);
+			json.put("reply_markup", keyboardMarkup);
+			return (JSONObject) sendPost(bot, "sendMessage", json);
+		});
 	}
 
 	public JSONArray getUpdates(AbstractTelegramBot bot) throws Exception {
@@ -56,12 +58,12 @@ public class TelegramBotApiRequestsSender {
 						apiTimeout));
 	}
 
-	public JSONObject getChat(AbstractTelegramBot bot, String chatName) throws Exception {
-		return (JSONObject) sendGet(bot, "getChat?chat_id=@" + chatName);
+	public JSONObject getChat(AbstractTelegramBot bot, String chatName) {
+		return safeCall(() -> (JSONObject) sendGet(bot, "getChat?chat_id=@" + chatName));
 	}
 
-	public JSONObject getChat(AbstractTelegramBot bot, int chatId) throws Exception {
-		return (JSONObject) sendGet(bot, "getChat?chat_id=" + chatId);
+	public JSONObject getChat(AbstractTelegramBot bot, int chatId) {
+		return safeCall(() -> (JSONObject) sendGet(bot, "getChat?chat_id=" + chatId));
 	}
 
 	private Object sendPost(AbstractTelegramBot bot, String methodName, JSONObject json) throws Exception {
@@ -112,5 +114,17 @@ public class TelegramBotApiRequestsSender {
 		byte[] result = new byte[stream.available()];
 		stream.read(result);
 		return result;
+	}
+
+	private JSONObject safeCall(Callable<JSONObject> lambda) {
+		try {
+			return lambda.call();
+		} catch (Exception e) {
+			LOGGER.error("Exception occurred while processing callable function", e);
+
+			JSONObject resp = new JSONObject();
+			resp.put("error", e.getLocalizedMessage());
+			return resp;
+		}
 	}
 }
