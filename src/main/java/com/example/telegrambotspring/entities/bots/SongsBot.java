@@ -1,9 +1,6 @@
 package com.example.telegrambotspring.entities.bots;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -18,14 +15,6 @@ import com.example.telegrambotspring.utils.Utils;
 
 public class SongsBot extends AbstractTelegramBot {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SongsBot.class);
-	private static final int _1_MINUTE = 60 * 1000;
-
-	private static final String ADD_SONG = "Запам'ятай пісню";
-	private static final String WRITING_SONG = "Записую...";
-	private static final String FORGET_ME = "Забудь мене";
-	private static final String START = "/start";
-	private static final String GREETINGS = "привіт)\nдавай поспіваємо";
-	private static final String MASTER_GREETINGS = "Слухаю тебе";
 
 	private boolean isMasterModeOn = false;
 	private boolean isAddSongOn = false;
@@ -62,18 +51,19 @@ public class SongsBot extends AbstractTelegramBot {
 	@Override
 	protected void processDirectMessage(TelegramBotApiRequestsSender requestsSender, JSONObject update) throws Exception {
 		JSONObject message = update.getJSONObject("message");
+		String lang = message.getJSONObject("from").getString("language_code");
 		String text = message.getString("text");
 		int chatId = message.getJSONObject("chat").getInt("id");
 
 		String normalizedText = Utils.normalizeString(text);
 		if ("master".equals(normalizedText)) {
-			becameMaster(requestsSender, chatId);
-		} else if (Utils.normalizeString(ADD_SONG).equalsIgnoreCase(normalizedText)) {
-			readyToAddSong(requestsSender, chatId);
-		} else if (Utils.normalizeString(FORGET_ME).equalsIgnoreCase(normalizedText)) {
-			processForgetMe(requestsSender, chatId);
-		} else if (START.equals(normalizedText)) {
-			requestsSender.sendMessage(this, chatId, GREETINGS);
+			becameMaster(requestsSender, chatId, lang);
+		} else if (Utils.normalizeString(getMessageString("add_song", lang)).equalsIgnoreCase(normalizedText)) {
+			readyToAddSong(requestsSender, chatId, lang);
+		} else if (Utils.normalizeString(getMessageString("forget_me", lang)).equalsIgnoreCase(normalizedText)) {
+			processForgetMe(requestsSender, chatId, lang);
+		} else if (getMessageString("start", lang).equals(text)) {
+			requestsSender.sendMessage(this, chatId, messageSource.getMessage("greetings", null, Locale.forLanguageTag(lang)));
 		} else {
 			if (isMasterModeOn) {
 				if (isAddSongOn) {
@@ -88,7 +78,7 @@ public class SongsBot extends AbstractTelegramBot {
 		}
 	}
 
-	private void becameMaster(TelegramBotApiRequestsSender requestsSender, int chatId) throws Exception {
+	private void becameMaster(TelegramBotApiRequestsSender requestsSender, int chatId, String lang) throws Exception {
 		isMasterModeOn = true;
 
 		JSONArray tableRows = new JSONArray();
@@ -96,30 +86,31 @@ public class SongsBot extends AbstractTelegramBot {
 		tableRows.put(rowOfButtons);
 
 		JSONObject addSongButton = new JSONObject();
-		addSongButton.put("text", ADD_SONG);
+		addSongButton.put("text", getMessageString("add_song", lang));
 		rowOfButtons.put(addSongButton);
 		JSONObject forgetMeButton = new JSONObject();
-		forgetMeButton.put("text", FORGET_ME);
+		forgetMeButton.put("text", getMessageString("forget_me", lang));
 		rowOfButtons.put(forgetMeButton);
 
 		JSONObject replyKeyboard = new JSONObject();
 		replyKeyboard.put("keyboard", tableRows);
 		replyKeyboard.put("one_time_keyboard", true);
 		replyKeyboard.put("resize_keyboard", true);
-		requestsSender.sendMessage(this, chatId, "Welcome back, my master!\n" + MASTER_GREETINGS, replyKeyboard);
+		requestsSender.sendMessage(this, chatId, getMessageString("master_greetings", lang),
+				replyKeyboard);
 	}
 
-	private void readyToAddSong(TelegramBotApiRequestsSender requestsSender, int chatId) throws Exception {
+	private void readyToAddSong(TelegramBotApiRequestsSender requestsSender, int chatId, String lang) throws Exception {
 		isAddSongOn = true;
-		requestsSender.sendMessage(this, chatId, WRITING_SONG);
+		requestsSender.sendMessage(this, chatId, getMessageString("writing_song", lang));
 	}
 
-	private void processForgetMe(TelegramBotApiRequestsSender requestsSender, int chatId) throws Exception {
+	private void processForgetMe(TelegramBotApiRequestsSender requestsSender, int chatId, String lang) throws Exception {
 		isMasterModeOn = false;
 		isAddSongOn = false;
 		JSONObject json = new JSONObject();
 		json.put("remove_keyboard", true);
-		requestsSender.sendMessage(this, chatId, GREETINGS, json);
+		requestsSender.sendMessage(this, chatId, getMessageString("greeting", lang), json);
 	}
 
 	private void sendNotImplemented(TelegramBotApiRequestsSender requestsSender, JSONObject update) throws Exception {
@@ -131,7 +122,7 @@ public class SongsBot extends AbstractTelegramBot {
 		JSONObject message = update.getJSONObject("message");
 
 		long date = message.getLong("date");
-		if (System.currentTimeMillis() - _1_MINUTE > date * 1000) {
+		if (System.currentTimeMillis() - Utils._1_MINUTE > date * Utils.MILLIS_MULTIPLIER) {
 			LOGGER.debug("Skipping message as it's too old");
 			return;
 		}

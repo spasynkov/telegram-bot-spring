@@ -1,15 +1,14 @@
 package com.example.telegrambotspring.entities.bots;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 
 import com.example.telegrambotspring.entities.Chat;
 import com.example.telegrambotspring.services.ResponseService;
@@ -23,6 +22,8 @@ public abstract class AbstractTelegramBot {
 	protected AtomicLong offset = new AtomicLong(0);
 	protected long lastUpdateTime;
 	protected UpdatesStrategy strategy;
+	@Autowired
+	protected MessageSource messageSource;
 
 	public AbstractTelegramBot(String token, Map<Chat, Pair<Long, String>> answersForChats, UpdatesStrategy strategy) {
 		this.token = token;
@@ -123,6 +124,10 @@ public abstract class AbstractTelegramBot {
 				offset = new AtomicLong(update_id);
 			}
 		}
+	}
+
+	protected String getMessageString(String messageName, String lang) {
+		return messageSource.getMessage(messageName, null, Locale.forLanguageTag(lang));
 	}
 
 	protected abstract void processDirectMessage(TelegramBotApiRequestsSender requestsSender, JSONObject update) throws Exception;
