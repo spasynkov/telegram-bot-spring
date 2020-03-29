@@ -1,7 +1,7 @@
 package com.example.telegrambotspring.repositories;
 
-import com.example.telegrambotspring.entities.SongCouplet;
+import com.example.telegrambotspring.entities.SongVerse;
 
-public interface SongsRepositoryCustom<T extends SongCouplet> {
+public interface SongsRepositoryCustom<T extends SongVerse> {
 	T updateOrInsert(T object);
 }

@@ -1,10 +1,9 @@
 package com.example.telegrambotspring.services;
 
+import com.example.telegrambotspring.repositories.SongsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
-
-import com.example.telegrambotspring.repositories.SongsRepository;
 
 @Service
 @Primary
@@ -17,7 +16,7 @@ public class DatabaseResponseService extends AbstractResponseService implements 
 	}
 
 	@Override
-	public void updateSongCouplets(String artist) throws Exception {
+	public void updateSongVerses(String artist) throws Exception {
 		sets = artist == null
 				? repository.findAll()
 				: repository.findAllByArtist(artist);
