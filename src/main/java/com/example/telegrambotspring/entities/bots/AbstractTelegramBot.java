@@ -3,6 +3,7 @@ package com.example.telegrambotspring.entities.bots;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.json.JSONArray;
@@ -43,6 +44,33 @@ public abstract class AbstractTelegramBot {
 
 	public UpdatesStrategy getStrategy() {
 		return strategy;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		SongsBot bot = (SongsBot) o;
+		return lastUpdateTime == bot.lastUpdateTime &&
+				Objects.equals(answersForChats, bot.answersForChats) &&
+				Objects.equals(token, bot.token) &&
+				Objects.equals(offset, bot.offset) &&
+				strategy == bot.strategy;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(answersForChats, token, offset, lastUpdateTime, strategy);
+	}
+
+	@Override
+	public String toString() {
+		return "Bot{" +
+				"token='" + token + '\'' +
+				", offset=" + offset +
+				", lastUpdateTime=" + lastUpdateTime +
+				", strategy=" + strategy +
+				'}';
 	}
 
 	public List<JSONObject> getUpdates(TelegramBotApiRequestsSender requestsSender) throws Exception {

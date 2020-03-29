@@ -39,27 +39,21 @@ public class SongsBot extends AbstractTelegramBot {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		SongsBot bot = (SongsBot) o;
-		return lastUpdateTime == bot.lastUpdateTime &&
+		return super.equals(o) &&
 				isMasterModeOn == bot.isMasterModeOn &&
-				isAddSongOn == bot.isAddSongOn &&
-				Objects.equals(answersForChats, bot.answersForChats) &&
-				Objects.equals(token, bot.token) &&
-				Objects.equals(offset, bot.offset) &&
-				strategy == bot.strategy;
+				isAddSongOn == bot.isAddSongOn;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(answersForChats, token, offset, lastUpdateTime, strategy, isMasterModeOn, isAddSongOn);
+		return Objects.hash(super.hashCode(), isMasterModeOn, isAddSongOn);
 	}
 
 	@Override
 	public String toString() {
+		String string = super.toString();
 		return "SongsBot{" +
-				"token='" + token + '\'' +
-				", offset=" + offset +
-				", lastUpdateTime=" + lastUpdateTime +
-				", strategy=" + strategy +
+				string.substring(string.indexOf("{") + 1, string.lastIndexOf("}")) +
 				(isMasterModeOn ? ", isMasterModeOn=true" : "") +
 				(isAddSongOn ? ", isAddSongOn=true" : "") +
 				'}';
