@@ -63,7 +63,7 @@ function addSong() {
         for (let i = 0; i < strings.length; i++) {
             text.push(strings[i]);
         }
-        let json = {artist: artist, song: song, verseId: verseId, text: text};
+        let json = {artist, song, verseId, text};
 
         console.log(json);
         var xhr = new XMLHttpRequest();
@@ -123,8 +123,8 @@ function updateSong() {
 
     let verses = text.split('\n\n');
     //console.log(verses);
-    for (let verseId = 0; verseId < verses.length; verseId++) {
-        let verse = verses[verseId];
+    for (let i = 0; i < verses.length; i++) {
+        let verse = verses[i];
         //console.log(verse);
         if (verse === '') continue;
 
@@ -133,7 +133,8 @@ function updateSong() {
         for (let i = 0; i < strings.length; i++) {
             text.push(strings[i]);
         }
-        let json = {artist: artist, song: song, verseId: (verseId + 1), text: text};
+        let verseId = i + 1;
+        let json = {artist, song, verseId, text};
 
         var xhr = new XMLHttpRequest();
         var url = '/rest/all/artist/' + artist + '/song/' + song;
