@@ -50,19 +50,19 @@ function addSong() {
     let song = document.getElementsByName("song")[0].value;
     let text = document.getElementsByName("text")[0].value;
 
-    let couplets = text.split('\n\n');
-    //console.log(couplets);
-    for (let coupletId = 1; coupletId <= couplets.length; coupletId++) {
-        let couplet = couplets[coupletId - 1];
-        //console.log(couplet);
-        if (couplet === '') continue;
+    let verses = text.split('\n\n');
+    //console.log(verses);
+    for (let verseId = 1; verseId <= verses.length; verseId++) {
+        let verse = verses[verseId - 1];
+        //console.log(verse);
+        if (verse === '') continue;
 
-        let strings = couplet.split('\n');
+        let strings = verse.split('\n');
         let text = [];
         for (let i = 0; i < strings.length; i++) {
             text.push(strings[i]);
         }
-        let json = {artist: artist, song: song, coupletId: coupletId, text: text};
+        let json = {artist, song, verseId, text};
 
         console.log(json);
         var xhr = new XMLHttpRequest();
@@ -99,7 +99,7 @@ function editPage() {
         var data = eval(JSON.parse(this.response));
         console.log(data);
         data.sort(function (a, b) {
-            return a.coupletId - b.coupletId;
+            return a.verseId - b.verseId;
         });
 
         data.forEach(d => {
@@ -120,19 +120,20 @@ function updateSong() {
     let song = document.getElementsByName("song")[0].value;
     let text = document.getElementsByName("text")[0].value;
 
-    let couplets = text.split('\n\n');
-    //console.log(couplets);
-    for (let coupletId = 0; coupletId < couplets.length; coupletId++) {
-        let couplet = couplets[coupletId];
-        //console.log(couplet);
-        if (couplet === '') continue;
+    let verses = text.split('\n\n');
+    //console.log(verses);
+    for (let i = 0; i < verses.length; i++) {
+        let verse = verses[i];
+        //console.log(verse);
+        if (verse === '') continue;
 
-        let strings = couplet.split('\n');
+        let strings = verse.split('\n');
         let text = [];
         for (let i = 0; i < strings.length; i++) {
             text.push(strings[i]);
         }
-        let json = {artist: artist, song: song, coupletId: (coupletId + 1), text: text};
+        let verseId = i + 1;
+        let json = {artist, song, verseId, text};
 
         var xhr = new XMLHttpRequest();
         var url = '/rest/all/artist/' + artist + '/song/' + song;
