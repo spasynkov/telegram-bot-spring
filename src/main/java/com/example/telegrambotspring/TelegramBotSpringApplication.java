@@ -1,5 +1,6 @@
 package com.example.telegrambotspring;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -15,6 +16,8 @@ import com.example.telegrambotspring.utils.Pair;
 @SpringBootApplication
 public class TelegramBotSpringApplication {
 	public static void main(String[] args) {
+		Date curTime = new Date();    //DeleteCode
+		System.out.println(curTime.getTime());
 		SpringApplication.run(TelegramBotSpringApplication.class, args);
 	}
 
