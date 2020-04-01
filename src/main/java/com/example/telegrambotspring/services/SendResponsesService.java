@@ -15,11 +15,11 @@ import org.springframework.stereotype.Service;
 import com.example.telegrambotspring.entities.Chat;
 import com.example.telegrambotspring.entities.bots.SongsBot;
 import com.example.telegrambotspring.utils.Pair;
+import com.example.telegrambotspring.utils.Utils;
 
 @Service
 public class SendResponsesService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SendResponsesService.class);
-	private static final short SECONDS_TO_MILLISECONDS_MULTIPLIER = 1000;
 
 	private TelegramBotApiRequestsSender requestsSender;
 	private Map<Chat, Pair<Long, String>> answersForChats;
@@ -67,7 +67,7 @@ public class SendResponsesService {
 					? sendMessageLatencyGroup
 					: sendMessageLatencyDirect;
 
-			if (lastMessageTime * SECONDS_TO_MILLISECONDS_MULTIPLIER < System.currentTimeMillis() - latency) {
+			if (lastMessageTime * Utils.MILLIS_MULTIPLIER < System.currentTimeMillis() - latency) {
 				try {
 					requestsSender.sendMessage(bot, chatId, preparedResponse);
 					iterator.remove();
