@@ -1,17 +1,16 @@
 package com.example.telegrambotspring.entities.bots;
 
-import java.util.*;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.example.telegrambotspring.entities.Chat;
 import com.example.telegrambotspring.services.ResponseService;
 import com.example.telegrambotspring.services.TelegramBotApiRequestsSender;
 import com.example.telegrambotspring.utils.Pair;
 import com.example.telegrambotspring.utils.Utils;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 public class SongsBot extends AbstractTelegramBot {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SongsBot.class);
@@ -76,6 +75,7 @@ public class SongsBot extends AbstractTelegramBot {
 				sendNotImplemented(requestsSender, update);
 			}
 		}
+
 	}
 
 	private void becameMaster(TelegramBotApiRequestsSender requestsSender, int chatId, String lang) throws Exception {

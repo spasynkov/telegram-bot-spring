@@ -2,19 +2,17 @@ package com.example.telegrambotspring.services;
 
 import com.example.telegrambotspring.entities.SongVerse;
 import com.example.telegrambotspring.repositories.SongsRepository;
+import com.example.telegrambotspring.utils.ErrorHandler;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.concurrent.Callable;
 
 @Service
-public class DatabaseService {
-	private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseService.class);
+public class DatabaseService implements ErrorHandler {
+
 
 	private SongsRepository repository;
 
@@ -73,17 +71,7 @@ public class DatabaseService {
 		});
 	}
 
-	private JSONObject safeCall(Callable<JSONObject> lambda) {
-		try {
-			return lambda.call();
-		} catch (Exception e) {
-			LOGGER.error("Exception occurred while processing callable function", e);
 
-			JSONObject resp = new JSONObject();
-			resp.put("error", e.getLocalizedMessage());
-			return resp;
-		}
-	}
 
 	private void validateData(SongVerse verse, String artist, String song) throws Exception {
 		if (!artist.equals(verse.getArtist())) {

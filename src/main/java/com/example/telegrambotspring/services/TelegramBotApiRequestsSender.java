@@ -1,6 +1,7 @@
 package com.example.telegrambotspring.services;
 
 import com.example.telegrambotspring.entities.bots.AbstractTelegramBot;
+import com.example.telegrambotspring.utils.ErrorHandler;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -9,8 +10,6 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -18,11 +17,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.Callable;
 
 @Service
-public class TelegramBotApiRequestsSender {
-	private static final Logger LOGGER = LoggerFactory.getLogger(TelegramBotApiRequestsSender.class);
+public class TelegramBotApiRequestsSender implements ErrorHandler {
+
 
 	private String apiUrl = "https://api.telegram.org/bot";
 
@@ -116,15 +114,4 @@ public class TelegramBotApiRequestsSender {
 		return result;
 	}
 
-	private JSONObject safeCall(Callable<JSONObject> lambda) {
-		try {
-			return lambda.call();
-		} catch (Exception e) {
-			LOGGER.error("Exception occurred while processing callable function", e);
-
-			JSONObject resp = new JSONObject();
-			resp.put("error", e.getLocalizedMessage());
-			return resp;
-		}
-	}
 }
