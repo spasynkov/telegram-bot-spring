@@ -9,4 +9,5 @@ public interface SongsRepository extends MongoRepository<SongVerse, String>, Son
 	List<SongVerse> findAllByArtist(String artist);
 
 	List<SongVerse> findAllByArtistAndSong(String artist, String song);
+
 }
