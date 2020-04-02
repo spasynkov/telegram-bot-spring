@@ -75,7 +75,6 @@ public class SongsBot extends AbstractTelegramBot {
 				sendNotImplemented(requestsSender, update);
 			}
 		}
-
 	}
 
 	private void becameMaster(TelegramBotApiRequestsSender requestsSender, int chatId, String lang) throws Exception {

@@ -2,7 +2,7 @@ package com.example.telegrambotspring.services;
 
 import com.example.telegrambotspring.entities.SongVerse;
 import com.example.telegrambotspring.repositories.SongsRepository;
-import com.example.telegrambotspring.utils.ErrorHandler;
+import com.example.telegrambotspring.utils.SafeCallable;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class DatabaseService implements ErrorHandler {
+public class DatabaseService implements SafeCallable {
 
 
 	private SongsRepository repository;

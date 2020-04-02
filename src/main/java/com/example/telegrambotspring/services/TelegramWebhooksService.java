@@ -3,9 +3,8 @@ package com.example.telegrambotspring.services;
 import com.example.telegrambotspring.entities.Chat;
 import com.example.telegrambotspring.entities.bots.AbstractTelegramBot;
 import com.example.telegrambotspring.utils.Pair;
+import com.example.telegrambotspring.utils.SafeCallable;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -14,8 +13,8 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class TelegramWebhooksService {
-	private static final Logger LOGGER = LoggerFactory.getLogger(TelegramWebhooksService.class);
+public class TelegramWebhooksService implements SafeCallable {
+
 
 	private ResponseService responseService;
 	private TelegramBotApiRequestsSender requestsSender;
@@ -34,15 +33,13 @@ public class TelegramWebhooksService {
 	}
 
 	public String proceedTelegramApiWebhook(String botToken, String jsonString) {
-		try {
+		return safeCall(() -> {
 			LOGGER.info("Got request: " + jsonString);
-
 			AbstractTelegramBot bot = findBotByToken(botToken);
-
 			if (bot == null) {
 				String errorText = "Unknown bot token";
 				LOGGER.debug(errorText);
-				return "{\"error\": \"" + errorText + "\"}";
+				return new JSONObject("{\"error\": \"" + errorText + "\"}");
 			}
 
 			JSONObject json = new JSONObject(jsonString);
@@ -51,12 +48,10 @@ public class TelegramWebhooksService {
 			} catch (Exception e) {
 				String errorText = "Unable to process message";
 				LOGGER.debug(errorText, e);
-				return "{\"error\": \"" + errorText + "\"}";
+				return new JSONObject("{\"error\": \"" + errorText + "\"}");
 			}
-		} catch (Exception e) {
-			LOGGER.error("Server error", e);
-		}
-		return "{\"status\": \"ok\"}";
+			return new JSONObject("{\"status\": \"ok\"}");
+		}).toString();
 	}
 
 	private AbstractTelegramBot findBotByToken(String botToken) {

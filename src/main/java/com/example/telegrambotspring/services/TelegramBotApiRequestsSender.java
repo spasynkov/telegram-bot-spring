@@ -1,7 +1,7 @@
 package com.example.telegrambotspring.services;
 
 import com.example.telegrambotspring.entities.bots.AbstractTelegramBot;
-import com.example.telegrambotspring.utils.ErrorHandler;
+import com.example.telegrambotspring.utils.SafeCallable;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -19,7 +19,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 @Service
-public class TelegramBotApiRequestsSender implements ErrorHandler {
+public class TelegramBotApiRequestsSender implements SafeCallable {
 
 
 	private String apiUrl = "https://api.telegram.org/bot";
