@@ -6,13 +6,28 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+
+/**
+ * The class описывает структуру формата хранения данных песни
+ * <b>id</b> and <b>artist</b> and <b>song</b> and <b>verseId</b> and <b>text</b>
+ * @author  Stas Pasynkov
+ *
+ * @see     com.example.telegrambotspring.entities.Chat
+ * @version 1.0.1
+ */
 public class SongVerse implements Comparable<SongVerse> {
+
+	/** идентификатор песни */
 	@Id
 	private String id;
 
+	/** имя исполнителя */
 	private String artist;
+	/** название песни */
 	private String song;
+	/** номер версии песни */
 	private int verseId;
+	/** текс песни */
 	private List<String> text;
 
 	public SongVerse() {
