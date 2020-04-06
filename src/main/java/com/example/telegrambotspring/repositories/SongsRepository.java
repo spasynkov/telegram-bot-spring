@@ -7,9 +7,10 @@ import java.util.List;
 
 /**
  * The interface уровня (слоя) Repository
- * реализует лонику работы непосредсвенно c БД
+ * реализует логику работы непосредсвенно c БД
  * наследуется от MongoRepository, имплементирует все его методы
- * и добавляет свои
+ * и тут можно добавлять свои методы в репозиторий, которые спринг распознает по их названию
+ * и автоматом сам создаст их реализацию
  * @author  Stas Pasynkov
  * @see     com.example.telegrambotspring.repositories.SongsRepositoryCustom
  * @see     com.example.telegrambotspring.repositories.SongsRepositoryCustomImpl

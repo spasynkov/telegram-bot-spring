@@ -117,6 +117,7 @@ public class DatabaseService {
 		return safeCall(() -> {
 			validateData(verse, artist, song);
 			SongVerse result = repository.updateOrInsert(verse);
+			int resI = repository.returnOne();
 			return new JSONObject(result);
 		});
 	}
