@@ -26,8 +26,14 @@ import java.util.concurrent.Callable;
 public class DatabaseService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseService.class);
 
+	/** объект класса репоизиторий - класс реализующий логику работы с БД */
 	private SongsRepository repository;
 
+
+	/**
+	 * Конструктор - создание нового объекта с определенными значениями
+	 * @param repository - объект класса репоизиторий
+	 */
 	@Autowired
 	public DatabaseService(SongsRepository repository) {
 		this.repository = repository;
@@ -35,32 +41,37 @@ public class DatabaseService {
 
 	/**
 	 * Метод чтения полного списка песен через обращение к репозиторию
-	 * @return возвращает коллекцию списка всех песен
+	 * @return возвращает коллекцию списка всех песен преобразованную в joson-массив
 	 */
 	public JSONArray getAll() {
-		LOGGER.debug("MYLOGGER : DatabaseService - > getAll");
-
 		List<SongVerse> list = repository.findAll();
 		return collectToJsonArray(list);
 	}
 
+	/**
+	 * Метод чтения всех песен данного испольнителя через обращение к репозиторию
+	 * @return возвращает коллекцию всех песен данного испольнителя преобразованную в joson-массив
+	 */
 	public JSONArray getAllByArtist(String artist) {
-		LOGGER.debug("MYLOGGER : DatabaseService - > getAllByArtist");
-
 		List<SongVerse> list = repository.findAllByArtist(artist);
+
 		return collectToJsonArray(list);
 	}
 
+	/**
+	 * Метод чтения всех версий песен данного испольнителя и названия песни - через обращение к репозиторию
+	 * @return возвращает коллекцию всех версий песен данного испольнителя и названия песни преобразованную в joson-массив
+	 */
 	public JSONArray getAllByArtistAndSong(String artist, String song) {
-		LOGGER.debug("MYLOGGER : DatabaseService - > getAllByArtistAndSong");
-
 		List<SongVerse> list = repository.findAllByArtistAndSong(artist, song);
 		return collectToJsonArray(list);
 	}
 
+	/**
+	 * Метод преобразует полученный список в joson-массив
+	 * @return возвращает полученный список преобразованный в joson-массив
+	 */
 	private JSONArray collectToJsonArray(List<SongVerse> list) {
-		LOGGER.debug("MYLOGGER : DatabaseService - > collectToJsonArray");
-
 		return new JSONArray(list);
 		/*return list.parallelStream()
 				.sorted()
@@ -71,19 +82,43 @@ public class DatabaseService {
 						Collector.Characteristics.CONCURRENT));*/
 	}
 
+	/**
+	 * Метод добавления новой песни в БД
+	 * вызывается в отдельном потоке
+	 * @param verse - объект типа SongVerse со всеми атрибутами
+	 * @param artist - имя исполнителя
+	 * @param song - название песни
+	 * @return возвращает объект типа SongVerse
+	 * текст песни и все ее атрибуды с присвоенным Id из БД одной строкой в виде json объекта
+	 */
 	public JSONObject addSong(SongVerse verse, String artist, String song) {
-		LOGGER.debug("MYLOGGER : DatabaseService - > addSong");
-
+		/**
+		 * Вызов метода в тдельном потоке используя лямбда выражения
+		 */
 		return safeCall(() -> {
 			validateData(verse, artist, song);
 			SongVerse result = repository.insert(verse);
 			return new JSONObject(result);
 		});
 	}
+/*
+Callable<JSONObject> lambda = (() -> {
+			validateData(verse, artist, song);
+			repository.delete(verse);
+			return new JSONObject()
+		}).call;
 
+ */
+
+
+	/**
+	 * Метод чтения всех версий песен данного испольнителя и названия песни - через обращение к репозиторию
+	 * @return возвращает коллекцию всех версий песен данного испольнителя и названия песни преобразованную в joson-массив
+	 */
 	public JSONObject editSong(SongVerse verse, String artist, String song) {
-		LOGGER.debug("MYLOGGER : DatabaseService - > editSong");
-
+		/**
+		 * Вызов метода в тдельном потоке используя лямбда выражения
+		 */
 		return safeCall(() -> {
 			validateData(verse, artist, song);
 			SongVerse result = repository.updateOrInsert(verse);
@@ -93,16 +128,25 @@ public class DatabaseService {
 
 	public JSONObject deleteSong(SongVerse verse, String artist, String song) {
 		LOGGER.debug("MYLOGGER : DatabaseService - > deleteSong");
-
+		/**
+		 * Вызов метода в тдельном потоке используя лямбда выражения
+		 */
 		return safeCall(() -> {
 			validateData(verse, artist, song);
 			repository.delete(verse);
 			return new JSONObject();
 		});
-	}
 
+
+	}
+	//
+
+	/**
+	 * безопасный вызов метода с проверкой всех исключений
+	 * @return возвращает полученный список преобразованный в joson
+	 */
 	private JSONObject safeCall(Callable<JSONObject> lambda) {
-		LOGGER.debug("MYLOGGER : DatabaseService - > deleteSong");
+		LOGGER.debug("MYLOGGER : DatabaseService - > safeCall");
 
 		try {
 			return lambda.call();
@@ -115,8 +159,19 @@ public class DatabaseService {
 		}
 	}
 
+
+	/**
+	 * Метод выполняет проверку, что имя исполнителя и название песни полученные в запросе совпадают
+	 * с именем исполнителя и названием песни находямися в объекте новой песни
+	 * @param verse - объект типа SongVerse со всеми атрибутами
+	 * @param artist - имя исполнителя
+	 * @param song - название песни
+	 * @return возвращает объект типа SongVerse (
+	 * @see com.example.telegrambotspring.entities.SongVerse
+	 * ) текст песни и все ее атрибуды с присвоенным Id из БД одной строкой
+	 */
 	private void validateData(SongVerse verse, String artist, String song) throws Exception {
-		LOGGER.debug("MYLOGGER : DatabaseService - > deleteSong");
+		LOGGER.debug("MYLOGGER : DatabaseService - > validateData");
 
 		if (!artist.equals(verse.getArtist())) {
 			throw new Exception("Incorrect request data: content artist not equals request artist");

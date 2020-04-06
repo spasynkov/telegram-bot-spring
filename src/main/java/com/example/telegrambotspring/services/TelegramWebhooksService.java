@@ -30,7 +30,7 @@ import com.example.telegrambotspring.utils.Pair;
  */
 @Service
 public class TelegramWebhooksService {
-	/** Вывод логов  */
+	/** переменная для записи логов  */
 	private static final Logger LOGGER = LoggerFactory.getLogger(TelegramWebhooksService.class);
 
 	/** переменная интерфейса ResponseService

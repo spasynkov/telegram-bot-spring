@@ -31,13 +31,11 @@ public class SongVerse implements Comparable<SongVerse> {
 	/** текс песни - тут только одни куплет*/
 	private List<String> text;
 
-
 	/**
 	 * Конструктор по умолчанию - создание нового объекта
 	 */
 	public SongVerse() {
 	}
-
 
 	/**
 	 * Конструктор - создание нового объекта с определенными значениями
@@ -53,7 +51,6 @@ public class SongVerse implements Comparable<SongVerse> {
 		this.text = text;
 	}
 
-
 	/**
 	 * Конструктор - создание нового объекта с определенными значениями
 	 * @param artist - имя исполнителя
@@ -64,7 +61,6 @@ public class SongVerse implements Comparable<SongVerse> {
 	public SongVerse(String artist, String song, int verseId, String... text) {
 		this(artist, song, verseId, Arrays.asList(text));
 	}
-
 
 	/**
 	 * метод - чтение идентификатора песни
@@ -175,6 +171,10 @@ public class SongVerse implements Comparable<SongVerse> {
 		return Objects.hash(artist, song, verseId, text);
 	}
 
+	/**
+	 * переопределяем метод toString
+	 * @return возвращает отформатированную строку
+	 */
 	@Override
 	public String toString() {
 		return String.format("SongVerse{id='%s', artist='%s', song='%s', verseId=%d, text=%s}",
@@ -183,7 +183,8 @@ public class SongVerse implements Comparable<SongVerse> {
 
 	/**
 	 * переопределяем метод compareTo
-	 * @return возвращает код сравнения: 0 объекты равны <>0 - не равны
+	 * @return возвращает результат сравнения: 0 объекты равны <>0 - не равны
+	 * сравнение происходит по полю исполнителя, названию песни и версии
 	 */
 	@Override
 	public int compareTo(SongVerse that) {
