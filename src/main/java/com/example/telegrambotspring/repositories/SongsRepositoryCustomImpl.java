@@ -15,7 +15,7 @@ import org.springframework.stereotype.Repository;
  * The class уровня (слоя) Repository
  * предназначен для создания собстенных методов,
  * которым спринг не сможет автоматом создать реализацию по названию
- * и которые будут  добавлены в репозитория
+ * и которые будут  добавлены в репозиторий со свойством
  * <b>mongoTemplate</b>
  * @author  Stas Pasynkov
  * @see     com.example.telegrambotspring.repositories.SongsRepositoryCustom
