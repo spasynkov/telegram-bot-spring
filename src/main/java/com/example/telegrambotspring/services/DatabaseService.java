@@ -50,6 +50,7 @@ public class DatabaseService {
 
 	/**
 	 * Метод чтения всех песен данного испольнителя через обращение к репозиторию
+	 * @param artist имя исполнителя
 	 * @return возвращает коллекцию всех песен данного испольнителя преобразованную в joson-массив
 	 */
 	public JSONArray getAllByArtist(String artist) {
@@ -60,6 +61,8 @@ public class DatabaseService {
 
 	/**
 	 * Метод чтения всех версий песен данного испольнителя и названия песни - через обращение к репозиторию
+	 * @param artist имя исполнителя
+	 * @param song название песни
 	 * @return возвращает коллекцию всех версий песен данного испольнителя и названия песни преобразованную в joson-массив
 	 */
 	public JSONArray getAllByArtistAndSong(String artist, String song) {

@@ -49,6 +49,7 @@ public class RestController {
 
 	/**
 	 * Метод получения полного списка песен данного исполнителя
+	 * @param artistName имя исполнителя
 	 * @return возвращает список всех песен данного исполнителя с текстом и др. параметрами типа SongVerse одной строкой
 	 */
 	@GetMapping("/all/artist/{artistName}")
@@ -58,6 +59,8 @@ public class RestController {
 
 	/**
 	 * Метод получения полного списка всех версий песен данного исполнителя и названия песни
+	 * @param artistName имя исполнителя
+	 * @param songName название песни
 	 * @return возвращает список всех версий песен данного исполнителя и названия песни с текстом и др. параметрами типа SongVerse одной строкой
 	 */
 	@GetMapping("/all/artist/{artistName}/song/{songName}")
