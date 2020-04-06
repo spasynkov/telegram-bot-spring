@@ -5,7 +5,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
 
-
 /**
  * The interface уровня (слоя) Repository
  * реализует лонику работы непосредсвенно c БД
@@ -19,12 +18,18 @@ import java.util.List;
 public interface SongsRepository extends MongoRepository<SongVerse, String>, SongsRepositoryCustom<SongVerse> {
 
 	/**
-	 * Метод чтения всех песен данного испольнителя через обращение к репозиторию
+	 * Метод чтения всех песен данного испольнителя непосредсвенно из БД
 	 * @param artist имя исполнителя
-	 * @return возвращает коллекцию всех песен данного испольнителя преобразованную в joson-массив
+	 * @return возвращает коллекцию всех песен данного испольнителя
 	 */
 	List<SongVerse> findAllByArtist(String artist);
 
+	/**
+	 * Метод чтения всех версий песен данного испольнителя и названия песни непосредсвенно из БД
+	 * @param artist имя исполнителя
+	 * @param song название песни
+	 * @return возвращает коллекцию всех версий песен данного испольнителя и названия песни
+	 */
 	List<SongVerse> findAllByArtistAndSong(String artist, String song);
 
 }
