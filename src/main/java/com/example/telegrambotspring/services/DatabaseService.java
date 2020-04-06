@@ -16,7 +16,7 @@ import java.util.concurrent.Callable;
 /**
  * The class уровня (слоя) Business Service - слоя бизнес-логики
  * содержат бизнес-логику и вызывают методы на уровне хранилища
- * класс реализует лонику работы c БД
+ * класс реализует лонику работы c БД со свойствами
  * <b>repository</b>
  * @author  Stas Pasynkov
  * @see     com.example.telegrambotspring.services.DatabaseResponseService
@@ -32,7 +32,7 @@ public class DatabaseService {
 
 	/**
 	 * Конструктор - создание нового объекта с определенными значениями
-	 * @param repository - объект класса репоизиторий
+	 * @param repository объект класса репоизиторий
 	 */
 	@Autowired
 	public DatabaseService(SongsRepository repository) {
