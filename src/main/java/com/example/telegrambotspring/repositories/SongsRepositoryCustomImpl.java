@@ -13,7 +13,9 @@ import org.springframework.stereotype.Repository;
 
 /**
  * The class уровня (слоя) Repository
- * предназначен для создания методов
+ * предназначен для создания собстенных методов,
+ * которым спринг не сможет автоматом создать реализацию по названию
+ * и которые будут  добавлены в репозитория
  * <b>mongoTemplate</b>
  * @author  Stas Pasynkov
  * @see     com.example.telegrambotspring.repositories.SongsRepositoryCustom
@@ -21,22 +23,29 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public class SongsRepositoryCustomImpl<T extends SongVerse> implements SongsRepositoryCustom<T> {
+	/**
+	 * переменная типа MongoTemplate для доступа к репозиторию
+	 */
 	private final MongoTemplate mongoTemplate;
     private static final Logger MYLOGGER = LoggerFactory.getLogger(SongsRepositoryCustomImpl.class);
 
-
+	/**
+	 * Конструктор - создание нового объекта с определенными значениями
+	 * @param mongoTemplate переменная доступа к репозиторию
+	 */
     @Autowired
 	public SongsRepositoryCustomImpl(MongoTemplate mongoTemplate) {
 		this.mongoTemplate = mongoTemplate;
 	}
 
-
-
+	/**
+	 * Реализация метода объявленного в интерфейсе SongsRepositoryCustom
+	 * @param object переменная содежращая все параметры отредактированной песни
+	 * @return возвращает объект песню (в виде строки) куда будет происходить внесение изменений
+	 * полученных в переменной object
+	 */
 	@Override
 	public T updateOrInsert(T object) {
-        MYLOGGER.debug("MYLOGGER : SongsRepositoryCustomImpl -> updateOrInsert");
-        MYLOGGER.debug("MYLOGGER : SongsRepositoryCustomImpl -> updateOrInsert" + object.toString());
-
         Query query = new Query();
 		query.addCriteria(Criteria.where("artist").is(object.getArtist()));
 		query.addCriteria(Criteria.where("song").is(object.getSong()));
@@ -47,8 +56,6 @@ public class SongsRepositoryCustomImpl<T extends SongVerse> implements SongsRepo
 
 		@SuppressWarnings("unchecked")  // TODO: fix
 				T result = (T) mongoTemplate.findAndModify(query, update, object.getClass());
-        MYLOGGER.debug("MYLOGGER : SongsRepositoryCustomImpl -> updateOrInsert" + result.toString());
-
 
         if (result == null) {
 			result = mongoTemplate.insert(object);
