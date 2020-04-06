@@ -19,16 +19,16 @@ import java.util.concurrent.Callable;
  * класс реализует лонику работы c БД
  * <b>repository</b>
  * @author  Stas Pasynkov
- * @see     com.example.telegrambotspring.services
+ * @see     com.example.telegrambotspring.services.DatabaseResponseService
  * @version 1.0.1
  */
 @Service
 public class DatabaseService {
+	/** переменная для записи логов  */
 	private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseService.class);
 
 	/** объект класса репоизиторий - класс реализующий логику работы с БД */
 	private SongsRepository repository;
-
 
 	/**
 	 * Конструктор - создание нового объекта с определенными значениями
@@ -40,7 +40,7 @@ public class DatabaseService {
 	}
 
 	/**
-	 * Метод чтения полного списка песен через обращение к репозиторию
+	 * Метод чтения всех песен через обращение к репозиторию
 	 * @return возвращает коллекцию списка всех песен преобразованную в joson-массив
 	 */
 	public JSONArray getAll() {
@@ -85,9 +85,9 @@ public class DatabaseService {
 	/**
 	 * Метод добавления новой песни в БД
 	 * вызывается в отдельном потоке
-	 * @param verse - объект типа SongVerse со всеми атрибутами
-	 * @param artist - имя исполнителя
-	 * @param song - название песни
+	 * @param verse объект типа SongVerse со всеми атрибутами
+	 * @param artist имя исполнителя
+	 * @param song название песни
 	 * @return возвращает объект типа SongVerse
 	 * текст песни и все ее атрибуды с присвоенным Id из БД одной строкой в виде json объекта
 	 */
@@ -101,19 +101,11 @@ public class DatabaseService {
 			return new JSONObject(result);
 		});
 	}
-/*
-Callable<JSONObject> lambda = (() -> {
-			validateData(verse, artist, song);
-			repository.delete(verse);
-			return new JSONObject()
-		}).call;
-
- */
-
 
 	/**
-	 * Метод чтения всех версий песен данного испольнителя и названия песни - через обращение к репозиторию
-	 * @return возвращает коллекцию всех версий песен данного испольнителя и названия песни преобразованную в joson-массив
+	 * Метод изменения текущей песни - через обращение к репозиторию
+	 * @return возвращает объект типа SongVerse
+	 * текст песни и все ее атрибуды из БД одной строкой в виде json объекта
 	 */
 	public JSONObject editSong(SongVerse verse, String artist, String song) {
 		/**
@@ -126,8 +118,11 @@ Callable<JSONObject> lambda = (() -> {
 		});
 	}
 
+	/**
+	 * Метод удаления всех версий песен данного испольнителя и названия песни - через обращение к репозиторию
+	 * @return возвращает пустой объект типа SongVerse в виде json объекта
+	 */
 	public JSONObject deleteSong(SongVerse verse, String artist, String song) {
-		LOGGER.debug("MYLOGGER : DatabaseService - > deleteSong");
 		/**
 		 * Вызов метода в тдельном потоке используя лямбда выражения
 		 */
@@ -136,18 +131,13 @@ Callable<JSONObject> lambda = (() -> {
 			repository.delete(verse);
 			return new JSONObject();
 		});
-
-
 	}
-	//
 
 	/**
 	 * безопасный вызов метода с проверкой всех исключений
 	 * @return возвращает полученный список преобразованный в joson
 	 */
 	private JSONObject safeCall(Callable<JSONObject> lambda) {
-		LOGGER.debug("MYLOGGER : DatabaseService - > safeCall");
-
 		try {
 			return lambda.call();
 		} catch (Exception e) {
@@ -159,20 +149,16 @@ Callable<JSONObject> lambda = (() -> {
 		}
 	}
 
-
 	/**
 	 * Метод выполняет проверку, что имя исполнителя и название песни полученные в запросе совпадают
 	 * с именем исполнителя и названием песни находямися в объекте новой песни
-	 * @param verse - объект типа SongVerse со всеми атрибутами
-	 * @param artist - имя исполнителя
-	 * @param song - название песни
-	 * @return возвращает объект типа SongVerse (
-	 * @see com.example.telegrambotspring.entities.SongVerse
-	 * ) текст песни и все ее атрибуды с присвоенным Id из БД одной строкой
+	 * @param verse объект типа SongVerse со всеми атрибутами
+	 * @param artist имя исполнителя
+	 * @param song название песни
+	 * @return возвращает объект типа SongVerse -
+	 * текст песни и все ее атрибуты с присвоенным Id из БД одной строкой
 	 */
 	private void validateData(SongVerse verse, String artist, String song) throws Exception {
-		LOGGER.debug("MYLOGGER : DatabaseService - > validateData");
-
 		if (!artist.equals(verse.getArtist())) {
 			throw new Exception("Incorrect request data: content artist not equals request artist");
 		}

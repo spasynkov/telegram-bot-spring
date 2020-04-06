@@ -9,7 +9,7 @@ import java.util.Objects;
 
 /**
  * The class описывает структуру формата хранения данных песни
- * в этой структуре хранится только один куплет песни
+ * в этой структуре хранится только один куплет песни со свойствами
  * <b>id</b> and <b>artist</b> and <b>song</b> and <b>verseId</b> and <b>text</b>
  * @author  Stas Pasynkov
  *
