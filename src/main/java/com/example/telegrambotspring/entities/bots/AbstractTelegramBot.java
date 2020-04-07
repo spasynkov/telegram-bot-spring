@@ -15,38 +15,77 @@ import com.example.telegrambotspring.services.ResponseService;
 import com.example.telegrambotspring.services.TelegramBotApiRequestsSender;
 import com.example.telegrambotspring.utils.Pair;
 
+/**
+ * The abstract class уровня (слоя) Service
+ * ????????????????
+ * реализация класса:
+ * @see     com.example.telegrambotspring.entities.bots.SongsBot
+ * @version 1.0.1
+ */
 public abstract class AbstractTelegramBot {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractTelegramBot.class);
+	/** мапа ответа в чат */
 	protected final Map<Chat, Pair<Long, String>> answersForChats;
+	/** идентификатор для доступа к боту */
 	protected String token;
+	/** ??? */
 	protected AtomicLong offset = new AtomicLong(0);
+	/** время последнего обновления */
 	protected long lastUpdateTime;
+	/** режим работы бота */
 	protected UpdatesStrategy strategy;
+	/** ??? */
 	@Autowired
 	protected MessageSource messageSource;
 
+
+	/**
+	 * Конструктор абстрактного класса - создание нового объекта с определенными значениями
+	 * @param token идентификатор для доступа к боту
+	 * @param answersForChats мапа ответа в чат
+	 * @param strategy режим работы бота
+	 */
 	public AbstractTelegramBot(String token, Map<Chat, Pair<Long, String>> answersForChats, UpdatesStrategy strategy) {
 		this.token = token;
 		this.answersForChats = answersForChats;
 		this.strategy = strategy;
 	}
 
+	/**
+	 * Метод получения токина
+	 * @return возвращает токин
+	 */
 	public String getToken() {
 		return token;
 	}
 
+	/**
+	 * Метод получения ???
+	 * @return возвращает ???
+	 */
 	public AtomicLong getOffset() {
 		return offset;
 	}
 
+	/**
+	 * Метод получения ???
+	 * @return возвращает ???
+	 */
 	public long getLastUpdateTime() {
 		return lastUpdateTime;
 	}
 
+	/**
+	 * Метод получения режим работы бота
+	 * @return возвращает режим работы бота
+	 */
 	public UpdatesStrategy getStrategy() {
 		return strategy;
 	}
 
+	/**
+	 * Переопределяем метод equals
+	 */
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
@@ -59,11 +98,18 @@ public abstract class AbstractTelegramBot {
 				strategy == bot.strategy;
 	}
 
+
+	/**
+	 * Переопределяем метод hashCode
+	 */
 	@Override
 	public int hashCode() {
 		return Objects.hash(answersForChats, token, offset, lastUpdateTime, strategy);
 	}
 
+	/**
+	 * Переопределяем метод toString
+	 */
 	@Override
 	public String toString() {
 		return "Bot{" +
@@ -90,11 +136,19 @@ public abstract class AbstractTelegramBot {
 		return result;
 	}
 
+	/**
+	 * ???
+	 * @param responseService - ???????
+	 * @param requestsSender - ???????
+	 * @param updates массив с текстами сообщений в формате json полученных с телеграмм
+	 * @return возвращает - ???????
+	 */
 	public void processUpdates(ResponseService responseService, TelegramBotApiRequestsSender requestsSender, JSONObject... updates) {
 		for (JSONObject update : updates) {
 			String chatType = update.optJSONObject("message")
 					.optJSONObject("chat")
 					.optString("type", "");
+			LOGGER.debug("chatType " + chatType);
 
 			if (chatType.isEmpty()) {
 				LOGGER.debug("Unable to get chat type: " + update);
@@ -112,6 +166,9 @@ public abstract class AbstractTelegramBot {
 				}
 			} else {
 				try {
+					LOGGER.debug("responseService " + responseService);
+					LOGGER.debug("update " + update);
+
 					processGroupMessage(responseService, update);
 				} catch (Exception e) {
 					processed = false;
@@ -132,8 +189,21 @@ public abstract class AbstractTelegramBot {
 
 	protected abstract void processDirectMessage(TelegramBotApiRequestsSender requestsSender, JSONObject update) throws Exception;
 
+	/**
+	 * ???
+	 * @param responseService - ???????
+	 * @param update - ???????
+	 * @return возвращает - ???????
+	 * реализация класса:
+	 * @see     com.example.telegrambotspring.entities.bots.SongsBot
+	 */
 	protected abstract void processGroupMessage(ResponseService responseService, JSONObject update);
 
+	/**
+	 * перечисление  - стратегий работы бота
+	 * LONG_POOLING - периодически опрашивает сервера телеграмма на наличие новых сообщений
+	 * WEBHOOKS - указываем телеграму определенный URL, куда он будет отправлять нам каждое новое сообщение для бота
+	 */
 	public enum UpdatesStrategy {
 		LONG_POOLING,
 		WEBHOOKS

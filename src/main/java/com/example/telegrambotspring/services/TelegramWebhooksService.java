@@ -17,8 +17,8 @@ import com.example.telegrambotspring.utils.Pair;
 /**
  * The class уровня (слоя) Business Service - слоя бизнес-логики
  * содержат бизнес-логику и вызывают методы на уровне хранилища
- * класс реализует лонику работы обработки сообщений от бота в режиме webhooks
- * <b>LOGGER</b> and <b>responseService</b> and <b>requestsSender</b> and <b>answersForChats</b> and <b>bots</b>
+ * класс реализует лонику работы обработки сообщений от бота в режиме webhooks со свойствами
+ * <b>responseService</b> and <b>requestsSender</b> and <b>answersForChats</b> and <b>bots</b>
  * @author  Stas Pasynkov
  * @see     com.example.telegrambotspring.services.AbstractResponseService
  * @see     com.example.telegrambotspring.services.DatabaseResponseService
@@ -33,21 +33,16 @@ public class TelegramWebhooksService {
 	/** переменная для записи логов  */
 	private static final Logger LOGGER = LoggerFactory.getLogger(TelegramWebhooksService.class);
 
-	/** переменная интерфейса ResponseService
-	 * @see com.example.telegrambotspring.services.ResponseService
-	 */
+	/** переменная интерфейса ResponseService */
 	private ResponseService responseService;
-	/** объект класса TelegramBotApiRequestsSender
-	 * @see com.example.telegrambotspring.services.TelegramBotApiRequestsSender
-	 */
+
+	/** объект класса TelegramBotApiRequestsSender */
 	private TelegramBotApiRequestsSender requestsSender;
-	/** мапа ответа в чат
-	 * @see com.example.telegrambotspring.entities.Chat
-	 */
+
+	/** мапа ответа в чат */
 	private Map<Chat, Pair<Long, String>> answersForChats;
-	/** список объектов абстрактоного класса AbstractTelegramBot
-	 * @see com.example.telegrambotspring.entities.bots.AbstractTelegramBot
-	 */
+
+	/** список объектов абстрактоного класса AbstractTelegramBot */
 	private List<AbstractTelegramBot> bots;
 
 	/**
@@ -70,23 +65,26 @@ public class TelegramWebhooksService {
 
 	/**
 	 * ???
-	 * @param botToken - уникальный идентификатор, ключ для доступа к боту
-	 * @param jsonString - текст сообщения в формате json
-	 * @return возвращает - результат обработки сообщения с чата (OK OR код ошибки)
+	 * @param botToken уникальный идентификатор, ключ для доступа к боту
+	 * @param jsonString текст сообщения в формате json полученный с телеграмм
+	 * @return возвращает результат обработки сообщения с чата (OK OR код ошибки)
 	 */
 	public String proceedTelegramApiWebhook(String botToken, String jsonString) {
-		LOGGER.info("Got request: " + jsonString);
+		LOGGER.info("proceedTelegramApiWebhook Got request: " + jsonString);
 
-		/** объект абстрактоного класса AbstractTelegramBot
-		 * @see com.example.telegrambotspring.entities.bots.AbstractTelegramBot
-		 */
+		/** получаем объект ботпо его токину
+		 * объект абстрактного класса AbstractTelegramBot	 */
 		AbstractTelegramBot bot = findBotByToken(botToken);
 
+		/** если бот не найден выходим и отправляем в телеграмм код ошибки*/
 		if (bot == null) {
 			String errorText = "Unknown bot token";
 			LOGGER.debug(errorText);
 			return "{\"error\": \"" + errorText + "\"}";
 		}
+		LOGGER.info("responseService: " + responseService);
+		LOGGER.info("requestsSender: " + requestsSender);
+
 
 		JSONObject json = new JSONObject(jsonString);
 		try {
@@ -97,9 +95,16 @@ public class TelegramWebhooksService {
 			return "{\"error\": \"" + errorText + "\"}";
 		}
 
+		/** если все прошло без ошибок в телеграмм статус ОК*/
 		return "{\"status\": \"ok\"}";
 	}
 
+
+	/**
+	 * метод поиска нужного бота в списке ботов (bots)
+	 * @param botToken уникальный идентификатор, ключ для доступа к боту
+	 * @return возвращает искомого бота иначе null
+	 */
 	private AbstractTelegramBot findBotByToken(String botToken) {
 		for (AbstractTelegramBot bot : bots) {
 			if (bot.getToken().equals(botToken)) {

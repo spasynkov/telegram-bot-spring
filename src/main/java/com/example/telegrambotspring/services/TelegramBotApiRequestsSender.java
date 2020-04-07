@@ -72,6 +72,8 @@ public class TelegramBotApiRequestsSender {
 		LOGGER.info("sending request at: " + requestUrl);
 
 		HttpPost post = new HttpPost(requestUrl);
+		LOGGER.info("post: " + post);
+
 		post.setEntity(new StringEntity(json.toString(), "UTF-8"));
 		post.setHeader("Accept", "application/json");
 		post.setHeader("Content-Type", "application/json");

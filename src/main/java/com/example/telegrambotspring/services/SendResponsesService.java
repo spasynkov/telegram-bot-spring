@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import com.example.telegrambotspring.controllers.RestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ import com.example.telegrambotspring.utils.Utils;
  * The class уровня (слоя) Business Service - слоя бизнес-логики
  * содержат бизнес-логику и вызывают методы на уровне хранилища
  * класс ???
- * <b>LOGGER</b> and <b>requestsSender</b> and <b>answersForChats</b> and <b>sendMessageLatencyGroup</b> and <b>sendMessageLatencyDirect</b>
+ * <b>requestsSender</b> and <b>answersForChats</b> and <b>sendMessageLatencyGroup</b> and <b>sendMessageLatencyDirect</b>
  * @author  Stas Pasynkov
  * @see     com.example.telegrambotspring.services.TelegramWebhooksService
  * @see     com.example.telegrambotspring.services.DatabaseResponseService
@@ -34,6 +35,8 @@ import com.example.telegrambotspring.utils.Utils;
 @Service
 public class SendResponsesService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SendResponsesService.class);
+	private static final Logger MYLOGGER = LoggerFactory.getLogger(SendResponsesService.class);
+
 	/** объект класса TelegramBotApiRequestsSender ??? */
 	private TelegramBotApiRequestsSender requestsSender;
 	/** мапа ответа в чат */
@@ -51,6 +54,7 @@ public class SendResponsesService {
 	public SendResponsesService(@Qualifier("answersForChats") Map<Chat, Pair<Long, String>> answersForChats,
 	                            SongsBot bot,    // TODO: hardcoded bot instance. rewrite with chat response object
 	                            TelegramBotApiRequestsSender requestsSender, ThreadPoolTaskExecutor executor) {
+		MYLOGGER.debug("Старт SendResponsesService");
 
 		this.answersForChats = answersForChats;
 		this.requestsSender = requestsSender;
@@ -74,6 +78,8 @@ public class SendResponsesService {
 
 	private void sendResponses(SongsBot bot) {
 		Iterator<Map.Entry<Chat, Pair<Long, String>>> iterator = answersForChats.entrySet().iterator();
+		MYLOGGER.debug("answersForChats= " + answersForChats);
+
 		while (iterator.hasNext()) {
 			Map.Entry<Chat, Pair<Long, String>> entry = iterator.next();
 			int chatId = entry.getKey().getChatId();
@@ -87,8 +93,16 @@ public class SendResponsesService {
 			long t1 = System.currentTimeMillis() - latency;
 			long t2 = lastMessageTime * Utils.MILLIS_MULTIPLIER;
 			long t3 = t2 - t1;
+			MYLOGGER.debug("TimeMil " + System.currentTimeMillis());
+			MYLOGGER.debug("latency " + latency);
+			MYLOGGER.debug("1 param=" + t2);
+			MYLOGGER.debug("2 param=" + t1);
+			MYLOGGER.debug("2 - 1 = " + t3);
+
 
 			if (lastMessageTime * Utils.MILLIS_MULTIPLIER < System.currentTimeMillis() - latency) {
+				LOGGER.error("Запрос еще актуален");
+
 				try {
 					requestsSender.sendMessage(bot, chatId, preparedResponse);
 					iterator.remove();
@@ -96,6 +110,8 @@ public class SendResponsesService {
 					LOGGER.error("Unable to send response or delete chat from map", e);
 				}
 			}
+			//Delete
+			LOGGER.error("Запрос слишком старый");
 		}
 	}
 }

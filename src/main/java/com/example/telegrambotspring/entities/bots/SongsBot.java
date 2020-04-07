@@ -13,6 +13,14 @@ import com.example.telegrambotspring.services.TelegramBotApiRequestsSender;
 import com.example.telegrambotspring.utils.Pair;
 import com.example.telegrambotspring.utils.Utils;
 
+
+/**
+ * The class ??????
+ * ????????????????
+ * наследник класса:
+ * @see     com.example.telegrambotspring.entities.bots.AbstractTelegramBot
+ * @version 1.0.1
+ */
 public class SongsBot extends AbstractTelegramBot {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SongsBot.class);
 
@@ -118,8 +126,16 @@ public class SongsBot extends AbstractTelegramBot {
 		requestsSender.sendMessage(this, chatId, "Not implemented yet!");
 	}
 
+
+	/**
+	 * ???
+	 * @param responseService - ???????
+	 * @param update текст сообщения в формате json полученный с телеграмм
+	 * @return возвращает - ???????
+	 */
 	protected void processGroupMessage(ResponseService responseService, JSONObject update) {
 		JSONObject message = update.getJSONObject("message");
+		LOGGER.debug("update" + update);
 
 		long date = message.getLong("date");
 		if (System.currentTimeMillis() - Utils._1_MINUTE > date * Utils.MILLIS_MULTIPLIER) {
@@ -128,9 +144,13 @@ public class SongsBot extends AbstractTelegramBot {
 		}
 
 		String text = message.optString("text", "");
+		LOGGER.debug("text" + text);
+
 		String response = null;
 		try {
 			response = responseService.getResponse(text);
+			LOGGER.debug("text" + text);
+
 		} catch (Exception e) {
 			LOGGER.error("Unable to find suitable response", e);
 		}
