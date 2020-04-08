@@ -1,17 +1,27 @@
 package com.example.telegrambotspring.services;
 
 import com.example.telegrambotspring.entities.SongVerse;
+import com.example.telegrambotspring.entities.bots.SongsBot;
 import com.example.telegrambotspring.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.LinkedList;
 import java.util.List;
 
 public abstract class AbstractResponseService implements ResponseService {
 	protected List<SongVerse> sets = new LinkedList<>();
+	private static final Logger MYLOGGER = LoggerFactory.getLogger(AbstractResponseService.class);
+
 
 	@Override
 	public String getResponse(String... textParts) throws Exception {
+		//если список песен пустой, то обновим его из БД
+		MYLOGGER.debug("sets" + sets);
+
 		if (sets.isEmpty()) updateSongVerses(null);
+		MYLOGGER.debug("udate sets" + sets);
+
 
 		SongVerse foundSet = null;
 		for (SongVerse set : sets) {
