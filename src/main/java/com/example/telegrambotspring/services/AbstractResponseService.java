@@ -9,6 +9,16 @@ import org.slf4j.LoggerFactory;
 import java.util.LinkedList;
 import java.util.List;
 
+
+/**
+ * The abstract class уровня (слоя) Service
+ * имплементируем методы интерфейса ResponseService
+ * со свойствами
+ * <b>sets</b>
+ * @see     com.example.telegrambotspring.services.AbstractResponseService
+ * @see     com.example.telegrambotspring.services.ResponseService
+ * @version 1.0.1
+ */
 public abstract class AbstractResponseService implements ResponseService {
 	protected List<SongVerse> sets = new LinkedList<>();
 	private static final Logger MYLOGGER = LoggerFactory.getLogger(AbstractResponseService.class);

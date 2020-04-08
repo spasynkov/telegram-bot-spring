@@ -149,15 +149,24 @@ public class SongsBot extends AbstractTelegramBot {
 		String response = null;
 		try {
 			response = responseService.getResponse(text);
-			LOGGER.debug("text" + text);
+			LOGGER.debug("text ->response " + response);
 
 		} catch (Exception e) {
 			LOGGER.error("Unable to find suitable response", e);
 		}
 		if (response != null && !response.isEmpty()) {
+			/** получаем структуру данных по чату */
 			JSONObject chat = message.getJSONObject("chat");
+			/** получаем идентификатор чата */
 			int chatId = chat.getInt("id");
+			/** получаем принадлежность чата */
 			String type = chat.getString("type");
+			/**
+			 * создаем новый объект чата
+			 * создаем
+			 *
+			 * ????????????????????????????
+			 * */
 			answersForChats.put(new Chat(chatId, type), new Pair<>(date, response));
 		}
 	}
