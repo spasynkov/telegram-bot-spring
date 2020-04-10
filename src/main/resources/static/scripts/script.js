@@ -15,6 +15,12 @@ function printList() {
     request.open('GET', '/rest/all', true);
 
     request.onload = function () {
+        if (request.status !== 200) {
+            listContainer.innerText = 'Unable to get list of songs';
+            // listContainer.innerHTML = '<div>' + listContainer.innerText + this.response + '</div>';  // uncomment to see response
+            return;
+        }
+
         var data = JSON.parse(this.response);
 
         listContainer.innerText = '';
