@@ -2,6 +2,13 @@ package com.example.telegrambotspring.utils;
 
 import java.util.Objects;
 
+
+/**
+ * The class
+ * со свойствами
+ * <b>first</b> and <b>second</b>
+ * @version 1.0.1
+ */
 public class Pair<F, S> {
 	private F first;
 	private S second;
@@ -26,7 +33,11 @@ public class Pair<F, S> {
 	public void setSecond(S second) {
 		this.second = second;
 	}
-
+	/**
+	 * переопределяем метод equals
+	 * @return возвращает boolean результат сравнения чатов по следующим полям
+	 * first, second
+	 */
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
@@ -36,11 +47,19 @@ public class Pair<F, S> {
 				Objects.equals(second, pair.second);
 	}
 
+	/**
+	 * переопределяем метод hashCode
+	 * @return возвращает hashCode Objects
+	 */
 	@Override
 	public int hashCode() {
 		return Objects.hash(first, second);
 	}
 
+	/**
+	 * переопределяем метод toString
+	 * @return возвращает отформатированную строку
+	 */
 	@Override
 	public String toString() {
 		return String.format("Pair{first=%s, second=%s}", first, second);

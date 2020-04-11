@@ -20,18 +20,20 @@ import java.util.List;
  * @version 1.0.1
  */
 public abstract class AbstractResponseService implements ResponseService {
+	/** список всех песен из БД */
 	protected List<SongVerse> sets = new LinkedList<>();
 	private static final Logger MYLOGGER = LoggerFactory.getLogger(AbstractResponseService.class);
 
-
+	/**
+	 * метод - формирования ответа
+	 * @param textParts массив строк содержащих message из тела запроса
+	 * @return возвращает строку с ответом для телеграмм
+	 */
 	@Override
 	public String getResponse(String... textParts) throws Exception {
-		//если список песен пустой, то обновим его из БД
-		MYLOGGER.debug("sets" + sets);
-
+		/**  если список песен пустой, то обновим его из БД,
+		 * если не указан исполнитель, то получаем весь спиок песен */
 		if (sets.isEmpty()) updateSongVerses(null);
-		MYLOGGER.debug("udate sets" + sets);
-
 
 		SongVerse foundSet = null;
 		for (SongVerse set : sets) {

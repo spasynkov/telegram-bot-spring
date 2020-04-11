@@ -17,6 +17,8 @@ import com.example.telegrambotspring.utils.Utils;
 /**
  * The class ??????
  * ????????????????
+ * со свойствами
+ * <b>isMasterModeOn</b> and <b>isAddSongOn</b>
  * наследник класса:
  * @see     com.example.telegrambotspring.entities.bots.AbstractTelegramBot
  * @version 1.0.1
@@ -128,26 +130,34 @@ public class SongsBot extends AbstractTelegramBot {
 
 
 	/**
-	 * ???
-	 * @param responseService - ???????
-	 * @param update текст сообщения в формате json полученный с телеграмм
-	 * @return возвращает - ???????
+	 * Метод обработки групповых сообщений
+	 * @param responseService - сервис формирования ответов
+	 * @param update текст сообщения в формате json полученный с телеграмм - содержимое поля message
 	 */
 	protected void processGroupMessage(ResponseService responseService, JSONObject update) {
+
+		/**  прочитаем текст сообщения */
 		JSONObject message = update.getJSONObject("message");
 		LOGGER.debug("update" + update);
+		LOGGER.debug("message" + message);
 
+		/**  время формирования сообщения */
 		long date = message.getLong("date");
+
+		/**  проверка актуальности сообщения - т.е. сообщение сформировано не более 1мин назад */
 		if (System.currentTimeMillis() - Utils._1_MINUTE > date * Utils.MILLIS_MULTIPLIER) {
 			LOGGER.debug("Skipping message as it's too old");
 			return;
 		}
 
+		/**  текст сообщения */
 		String text = message.optString("text", "");
-		LOGGER.debug("text" + text);
+		LOGGER.debug("text " + text);
 
+		/**  текст ответа */
 		String response = null;
 		try {
+			/**  формирование ответа */
 			response = responseService.getResponse(text);
 			LOGGER.debug("text ->response " + response);
 
@@ -161,8 +171,12 @@ public class SongsBot extends AbstractTelegramBot {
 			int chatId = chat.getInt("id");
 			/** получаем принадлежность чата */
 			String type = chat.getString("type");
+			LOGGER.debug("new Pair<>(date, response)" + new Pair<>(date, response));
+
 			/**
 			 * создаем новый объект чата
+			 * создаем новый объект
+			 * создаем новый объект
 			 * создаем
 			 *
 			 * ????????????????????????????

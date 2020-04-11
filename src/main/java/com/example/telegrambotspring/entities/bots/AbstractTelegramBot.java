@@ -137,24 +137,23 @@ public abstract class AbstractTelegramBot {
 	}
 
 	/**
-	 * ???
-	 * @param responseService - ???????
-	 * @param requestsSender - ???????
+	 * Метод обработки запросов
+	 * @param responseService - серис формирования ответов
+	 * @param requestsSender - отправка запросов
 	 * @param updates массив с текстами сообщений в формате json полученных с телеграмм
-	 * @return возвращает - ???????
 	 */
 	public void processUpdates(ResponseService responseService, TelegramBotApiRequestsSender requestsSender, JSONObject... updates) {
 		for (JSONObject update : updates) {
+			//определяем тип чата - личный/групповой
 			String chatType = update.optJSONObject("message")
 					.optJSONObject("chat")
 					.optString("type", "");
-			LOGGER.debug("chatType " + chatType);
 
 			if (chatType.isEmpty()) {
 				LOGGER.debug("Unable to get chat type: " + update);
 				continue;
 			}
-
+			/** флаг процесса обработки запроса */
 			boolean processed = true;
 
 			if ("private".equalsIgnoreCase(chatType)) {
@@ -175,10 +174,15 @@ public abstract class AbstractTelegramBot {
 					LOGGER.error("Unable to process group message", e);
 				}
 			}
-
+			/** если процесс обработки запроса прошел без ошибок*/
 			if (processed) {
+
 				long update_id = update.getLong("update_id");
+				LOGGER.debug("update_id: " + update_id);
+
 				offset = new AtomicLong(update_id);
+				LOGGER.debug("offset: " + offset);
+
 			}
 		}
 	}
@@ -190,12 +194,9 @@ public abstract class AbstractTelegramBot {
 	protected abstract void processDirectMessage(TelegramBotApiRequestsSender requestsSender, JSONObject update) throws Exception;
 
 	/**
-	 * ???
-	 * @param responseService - ???????
-	 * @param update - ???????
-	 * @return возвращает - ???????
-	 * реализация класса:
-	 * @see     com.example.telegrambotspring.entities.bots.SongsBot
+	 * Метод обработки групповых сообщений
+	 * @param responseService - сервис формирования ответов
+	 * @param update текст сообщения в формате json полученный с телеграмм - содержимое поля message
 	 */
 	protected abstract void processGroupMessage(ResponseService responseService, JSONObject update);
 

@@ -90,17 +90,9 @@ public class SendResponsesService {
 					? sendMessageLatencyGroup
 					: sendMessageLatencyDirect;
 
-			long t1 = System.currentTimeMillis() - latency;
-			long t2 = lastMessageTime * Utils.MILLIS_MULTIPLIER;
-			long t3 = t2 - t1;
-			MYLOGGER.debug("TimeMil " + System.currentTimeMillis());
-			MYLOGGER.debug("latency " + latency);
-			MYLOGGER.debug("1 param=" + t2);
-			MYLOGGER.debug("2 param=" + t1);
-			MYLOGGER.debug("2 - 1 = " + t3);
 
-
-			if (lastMessageTime * Utils.MILLIS_MULTIPLIER < System.currentTimeMillis() - latency) {
+//			if (lastMessageTime * Utils.MILLIS_MULTIPLIER < System.currentTimeMillis() - latency) {
+			if (true) {
 				LOGGER.error("Запрос еще актуален");
 
 				try {
@@ -110,8 +102,6 @@ public class SendResponsesService {
 					LOGGER.error("Unable to send response or delete chat from map", e);
 				}
 			}
-			//Delete
-			LOGGER.error("Запрос слишком старый");
 		}
 	}
 }
