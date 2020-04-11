@@ -4,35 +4,57 @@ import java.util.Objects;
 
 
 /**
- * The class
+ * The class содержащит данные время запроса и текст ответа
  * со свойствами
  * <b>first</b> and <b>second</b>
  * @version 1.0.1
  */
 public class Pair<F, S> {
+	/** время запроса */
 	private F first;
+	/** текст ответа */
 	private S second;
 
+	/**
+	 * Конструктор абстрактного класса - создание нового объекта с определенными значениями
+	 * @param first время запроса
+	 * @param second текст ответа
+	 */
 	public Pair(F first, S second) {
 		this.first = first;
 		this.second = second;
 	}
 
+	/**
+	 * метод - чтение времени запроса
+	 * @return возвращает время запроса
+	 */
 	public F getFirst() {
 		return first;
 	}
 
+	/**
+	 * метод - запись времени запроса
+	 */
 	public void setFirst(F first) {
 		this.first = first;
 	}
 
+	/**
+	 * метод - чтение текста ответа
+	 * @return возвращает текст ответа
+	 */
 	public S getSecond() {
 		return second;
 	}
 
+	/**
+	 * метод - запись текста ответа
+	 */
 	public void setSecond(S second) {
 		this.second = second;
 	}
+
 	/**
 	 * переопределяем метод equals
 	 * @return возвращает boolean результат сравнения чатов по следующим полям

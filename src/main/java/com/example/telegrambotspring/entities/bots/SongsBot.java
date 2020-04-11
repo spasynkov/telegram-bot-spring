@@ -33,6 +33,11 @@ public class SongsBot extends AbstractTelegramBot {
 		super(token, answersForChats, strategy);
 	}
 
+	/**
+	 * переопределяем метод equals
+	 * @return возвращает boolean результат сравнения чатов по следующим полям
+	 * isMasterModeOn, isAddSongOn
+	 */
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
@@ -43,11 +48,19 @@ public class SongsBot extends AbstractTelegramBot {
 				isAddSongOn == bot.isAddSongOn;
 	}
 
+	/**
+	 * переопределяем метод hashCode
+	 * @return возвращает hashCode Objects
+	 */
 	@Override
 	public int hashCode() {
 		return Objects.hash(super.hashCode(), isMasterModeOn, isAddSongOn);
 	}
 
+	/**
+	 * переопределяем метод toString
+	 * @return возвращает отформатированную строку
+	 */
 	@Override
 	public String toString() {
 		String string = super.toString();
@@ -175,11 +188,8 @@ public class SongsBot extends AbstractTelegramBot {
 
 			/**
 			 * создаем новый объект чата
-			 * создаем новый объект
-			 * создаем новый объект
-			 * создаем
-			 *
-			 * ????????????????????????????
+			 * создаем новый объект содержащий время запроса и тескт ответа
+			 * сохраняем в мапе новую запись содержащию объект чата и текст ответа
 			 * */
 			answersForChats.put(new Chat(chatId, type), new Pair<>(date, response));
 		}
