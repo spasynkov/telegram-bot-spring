@@ -64,7 +64,7 @@ public class TelegramWebhooksService {
 	}
 
 	/**
-	 * ???
+	 * Метод обработки сообщенией от телеграмм
 	 * @param botToken уникальный идентификатор, ключ для доступа к боту
 	 * @param jsonString текст сообщения в формате json полученный с телеграмм
 	 * @return возвращает результат обработки сообщения с чата (OK OR код ошибки)
@@ -72,7 +72,7 @@ public class TelegramWebhooksService {
 	public String proceedTelegramApiWebhook(String botToken, String jsonString) {
 		LOGGER.info("proceedTelegramApiWebhook Got request: " + jsonString);
 
-		/** получаем объект ботпо его токину
+		/** получаем объект бот по его токину
 		 * объект абстрактного класса AbstractTelegramBot	 */
 		AbstractTelegramBot bot = findBotByToken(botToken);
 
@@ -82,10 +82,7 @@ public class TelegramWebhooksService {
 			LOGGER.debug(errorText);
 			return "{\"error\": \"" + errorText + "\"}";
 		}
-		LOGGER.info("responseService: " + responseService);
-		LOGGER.info("requestsSender: " + requestsSender);
-
-
+		/** текст сообщения в формате json */
 		JSONObject json = new JSONObject(jsonString);
 		try {
 			bot.processUpdates(responseService, requestsSender, json);
@@ -95,7 +92,7 @@ public class TelegramWebhooksService {
 			return "{\"error\": \"" + errorText + "\"}";
 		}
 
-		/** если все прошло без ошибок в телеграмм статус ОК*/
+		/** если все прошло без ошибок отправляем в телеграмм статус ОК*/
 		return "{\"status\": \"ok\"}";
 	}
 

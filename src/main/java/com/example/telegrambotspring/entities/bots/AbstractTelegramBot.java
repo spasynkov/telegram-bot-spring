@@ -17,18 +17,21 @@ import com.example.telegrambotspring.utils.Pair;
 
 /**
  * The abstract class уровня (слоя) Service
- * ????????????????
+ * сервис работы с телеграмм ботом
  * реализация класса:
  * @see     com.example.telegrambotspring.entities.bots.SongsBot
  * @version 1.0.1
  */
 public abstract class AbstractTelegramBot {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractTelegramBot.class);
-	/** мапа ответа в чат */
+	/** мапа содержашая все ответы в чат */
 	protected final Map<Chat, Pair<Long, String>> answersForChats;
 	/** идентификатор для доступа к боту */
 	protected String token;
-	/** ??? */
+	/** update_id последнего обработанного обновления
+	 * Все обновления с update_id меньшим или равным offset
+	 * будут отмечены как подтверждённые и не будут больше возвращаться сервером
+	 */
 	protected AtomicLong offset = new AtomicLong(0);
 	/** время последнего обновления */
 	protected long lastUpdateTime;
@@ -60,8 +63,8 @@ public abstract class AbstractTelegramBot {
 	}
 
 	/**
-	 * Метод получения ???
-	 * @return возвращает ???
+	 * Метод получения уникального идентификатора последнего обработанного входящего обновления
+	 * @return возвращает уникального идентификатора последнего обработанного входящего обновления
 	 */
 	public AtomicLong getOffset() {
 		return offset;
@@ -144,7 +147,7 @@ public abstract class AbstractTelegramBot {
 	 */
 	public void processUpdates(ResponseService responseService, TelegramBotApiRequestsSender requestsSender, JSONObject... updates) {
 		for (JSONObject update : updates) {
-			//определяем тип чата - личный/групповой
+			/** определяем тип чата - личный/групповой */
 			String chatType = update.optJSONObject("message")
 					.optJSONObject("chat")
 					.optString("type", "");
@@ -176,13 +179,10 @@ public abstract class AbstractTelegramBot {
 			}
 			/** если процесс обработки запроса прошел без ошибок*/
 			if (processed) {
-
+				/** Уникальный идентификатор входящего обновления */
 				long update_id = update.getLong("update_id");
-				LOGGER.debug("update_id: " + update_id);
-
+				/** update_id последнего обработанного обновления */
 				offset = new AtomicLong(update_id);
-				LOGGER.debug("offset: " + offset);
-
 			}
 		}
 	}
