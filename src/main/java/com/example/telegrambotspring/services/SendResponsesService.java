@@ -21,7 +21,7 @@ import com.example.telegrambotspring.utils.Utils;
 /**
  * The class уровня (слоя) Business Service - слоя бизнес-логики
  * содержат бизнес-логику и вызывают методы на уровне хранилища
- * класс ???
+ * класс отправки ответов в телеграмм
  * <b>requestsSender</b> and <b>answersForChats</b> and <b>sendMessageLatencyGroup</b> and <b>sendMessageLatencyDirect</b>
  * @author  Stas Pasynkov
  * @see     com.example.telegrambotspring.services.TelegramWebhooksService
@@ -50,6 +50,13 @@ public class SendResponsesService {
 	@Value("${app.send-message-latency.direct}")
 	private long sendMessageLatencyDirect;
 
+	/**
+	 * Конструктор - создание нового объекта с определенными значениями
+	 * @param answersForChats - мапа ответа в чат
+	 * @param bot - ???
+	 * @param requestsSender - отправка запросов
+	 * @param executor - ???
+	 */
 	@Autowired
 	public SendResponsesService(@Qualifier("answersForChats") Map<Chat, Pair<Long, String>> answersForChats,
 	                            SongsBot bot,    // TODO: hardcoded bot instance. rewrite with chat response object
@@ -61,6 +68,7 @@ public class SendResponsesService {
 
 		Runnable runnable = () -> {
 			try {
+				/**  цикл пока не будет установлен флаг прерывания потока */
 				while (!Thread.currentThread().isInterrupted()) {
 					sendResponses(bot);
 
@@ -76,16 +84,28 @@ public class SendResponsesService {
 		executor.execute(runnable);
 	}
 
+	/**
+	 * Метод отправки ответов в телеграмм
+	 * @param bot - ???
+	 */
 	private void sendResponses(SongsBot bot) {
 		Iterator<Map.Entry<Chat, Pair<Long, String>>> iterator = answersForChats.entrySet().iterator();
 		MYLOGGER.debug("answersForChats= " + answersForChats);
 
+		/**  цикл пока в мапе есть готовые ответы для отправки */
 		while (iterator.hasNext()) {
+			MYLOGGER.debug("в мапе есть готовые ответы для отправки= ");
 			Map.Entry<Chat, Pair<Long, String>> entry = iterator.next();
+			/**  получаем идентификатор чата */
 			int chatId = entry.getKey().getChatId();
+			MYLOGGER.debug("получаем идентификатор чата= " + chatId);
+			/** время формирования запроса */
 			long lastMessageTime = entry.getValue().getFirst();
+
+			/** текст куплета песни для ответа */
 			String preparedResponse = entry.getValue().getSecond();
 
+			/** тайм-аут актуальности ответа в соответсвии с типом чата  */
 			long latency = entry.getKey().isGroup()
 					? sendMessageLatencyGroup
 					: sendMessageLatencyDirect;
@@ -93,10 +113,11 @@ public class SendResponsesService {
 
 //			if (lastMessageTime * Utils.MILLIS_MULTIPLIER < System.currentTimeMillis() - latency) {
 			if (true) {
-				LOGGER.error("Запрос еще актуален");
+				LOGGER.debug("Запрос еще актуален");
 
 				try {
 					requestsSender.sendMessage(bot, chatId, preparedResponse);
+					/**  удаляем этот запрос из мапы */
 					iterator.remove();
 				} catch (Exception e) {
 					LOGGER.error("Unable to send response or delete chat from map", e);

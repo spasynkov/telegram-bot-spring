@@ -18,7 +18,7 @@ public class Pair<F, S> {
 	/**
 	 * Конструктор абстрактного класса - создание нового объекта с определенными значениями
 	 * @param first время запроса
-	 * @param second текст ответа
+	 * @param second текст куплета песни для ответа
 	 */
 	public Pair(F first, S second) {
 		this.first = first;

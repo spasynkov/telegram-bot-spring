@@ -23,7 +23,7 @@ import java.util.concurrent.Callable;
 @Service
 public class TelegramBotApiRequestsSender {
 	private static final Logger LOGGER = LoggerFactory.getLogger(TelegramBotApiRequestsSender.class);
-
+	/** Все запросы к Telegram Bot API должны осуществляться через HTTPS */
 	private String apiUrl = "https://api.telegram.org/bot";
 
 	@Value("${telegram.bot.longPoolingTimeout}")
@@ -37,7 +37,16 @@ public class TelegramBotApiRequestsSender {
 		return safeCall(() -> (JSONObject) sendGet(bot, "getMe"));
 	}
 
+	/**
+	 * Метод отправки ответов в телеграмм
+	 * @param bot поля телеграмм бота
+	 * @param chatId идентификатор чата
+	 * @param text текст куплета песни для ответа
+	 * @return возвращает ответ на запрос sendMessage
+	 */
 	public JSONObject sendMessage(AbstractTelegramBot bot, int chatId, String text) {
+		LOGGER.debug("sendMessage = ");
+
 		return safeCall(() -> (JSONObject) sendGet(bot, "sendMessage?chat_id=" + chatId + "&text=" + URLEncoder.encode(text, "UTF-8")));
 	}
 
@@ -83,20 +92,43 @@ public class TelegramBotApiRequestsSender {
 		return parseResponse(resp, requestUrl);
 	}
 
+	/**
+	 * Метод отправки запроса
+	 * @param bot поля телеграмм бота
+	 * @param methodNameAndUrlParams имя метода запроса и его параметры
+	 * @return возвращает  статуса ответа на запрос sendMessage от телеграмм
+	 */
 	private Object sendGet(AbstractTelegramBot bot, String methodNameAndUrlParams) throws Exception {
+		/** формирование строки запроса для метода Telegram Bot API sendMessage */
 		final String requestUrl = getRequestUrl(bot) + methodNameAndUrlParams;
 
 		LOGGER.info("sending request at: " + requestUrl);
 
+		/** создание объекта HttpGet строки запроса для метода Telegram Bot API sendMessage */
 		HttpGet httpget = new HttpGet(requestUrl);
+		LOGGER.debug("httpget= " + httpget);
+
+
+		/** org.apache.http.impl.client.InternalHttpClient@67302d01 */
 		HttpClient client = HttpClients.createDefault();
+
+
 		HttpResponse resp = client.execute(httpget);
 
 		return parseResponse(resp, requestUrl);
 	}
 
+	/**
+	 * Метод чтения статуса ответа на запрос sendMessage от телеграмм
+	 * @param response ???
+	 * @param requestUrl ???
+	 * @return возвращает - ???
+	 */
 	private Object parseResponse(HttpResponse response, String requestUrl) throws Exception {
 		String content = getContent(response.getEntity().getContent());
+		LOGGER.debug("content= " + content);
+
+
 		JSONObject json = new JSONObject(content);
 		if (json.getBoolean("ok")) {
 			return json.get("result");
@@ -118,6 +150,10 @@ public class TelegramBotApiRequestsSender {
 		return result;
 	}
 
+	/**
+	 * безопасный вызов метода с проверкой всех исключений
+	 * @return возвращает ???? joson
+	 */
 	private JSONObject safeCall(Callable<JSONObject> lambda) {
 		try {
 			return lambda.call();
