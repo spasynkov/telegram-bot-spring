@@ -100,7 +100,7 @@ public class TelegramBotApiRequestsSender implements SafeCallable {
 		HttpResponse resp;
 
 		if (useProxy) {
-			String requestString = "bot" + bot.getToken() + "/" + methodNameAndUrlParams;
+			String requestString = "/bot" + bot.getToken() + "/" + methodNameAndUrlParams;
 			HttpHost target = new HttpHost("api.telegram.org", 443, "https");
 			HttpHost proxy = new HttpHost(proxyHost, proxyPort, "http");
 
