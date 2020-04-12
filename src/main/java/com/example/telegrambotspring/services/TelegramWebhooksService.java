@@ -1,18 +1,16 @@
 package com.example.telegrambotspring.services;
 
-import java.util.List;
-import java.util.Map;
-
+import com.example.telegrambotspring.entities.Chat;
+import com.example.telegrambotspring.entities.bots.AbstractTelegramBot;
+import com.example.telegrambotspring.utils.Pair;
+import com.example.telegrambotspring.utils.SafeCallable;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import com.example.telegrambotspring.entities.Chat;
-import com.example.telegrambotspring.entities.bots.AbstractTelegramBot;
-import com.example.telegrambotspring.utils.Pair;
+import java.util.List;
+import java.util.Map;
 
 /**
  * The class уровня (слоя) Business Service - слоя бизнес-логики
@@ -29,9 +27,8 @@ import com.example.telegrambotspring.utils.Pair;
  * @version 1.0.1
  */
 @Service
-public class TelegramWebhooksService {
-	/** переменная для записи логов  */
-	private static final Logger LOGGER = LoggerFactory.getLogger(TelegramWebhooksService.class);
+public class TelegramWebhooksService implements SafeCallable {
+
 
 	/** переменная интерфейса ResponseService */
 	private ResponseService responseService;
@@ -70,30 +67,25 @@ public class TelegramWebhooksService {
 	 * @return возвращает результат обработки сообщения с чата (OK OR код ошибки)
 	 */
 	public String proceedTelegramApiWebhook(String botToken, String jsonString) {
-		LOGGER.info("proceedTelegramApiWebhook Got request: " + jsonString);
+		return safeCall(() -> {
+			LOGGER.info("Got request: " + jsonString);
+			AbstractTelegramBot bot = findBotByToken(botToken);
+			if (bot == null) {
+				String errorText = "Unknown bot token";
+				LOGGER.debug(errorText);
+				return new JSONObject("{\"error\": \"" + errorText + "\"}");
+			}
 
-		/** получаем объект бот по его токину
-		 * объект абстрактного класса AbstractTelegramBot	 */
-		AbstractTelegramBot bot = findBotByToken(botToken);
-
-		/** если бот не найден выходим и отправляем в телеграмм код ошибки*/
-		if (bot == null) {
-			String errorText = "Unknown bot token";
-			LOGGER.debug(errorText);
-			return "{\"error\": \"" + errorText + "\"}";
-		}
-		/** текст сообщения в формате json */
-		JSONObject json = new JSONObject(jsonString);
-		try {
-			bot.processUpdates(responseService, requestsSender, json);
-		} catch (Exception e) {
-			String errorText = "Unable to process message";
-			LOGGER.debug(errorText, e);
-			return "{\"error\": \"" + errorText + "\"}";
-		}
-
-		/** если все прошло без ошибок отправляем в телеграмм статус ОК*/
-		return "{\"status\": \"ok\"}";
+			JSONObject json = new JSONObject(jsonString);
+			try {
+				bot.processUpdates(responseService, requestsSender, json);
+			} catch (Exception e) {
+				String errorText = "Unable to process message";
+				LOGGER.debug(errorText, e);
+				return new JSONObject("{\"error\": \"" + errorText + "\"}");
+			}
+			return new JSONObject("{\"status\": \"ok\"}");
+		}).toString();
 	}
 
 

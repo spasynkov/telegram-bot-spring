@@ -1,33 +1,42 @@
 package com.example.telegrambotspring.services;
 
-import com.example.telegrambotspring.entities.bots.AbstractTelegramBot;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.concurrent.Callable;
+import com.example.telegrambotspring.entities.bots.AbstractTelegramBot;
 
 @Service
-public class TelegramBotApiRequestsSender {
-	private static final Logger LOGGER = LoggerFactory.getLogger(TelegramBotApiRequestsSender.class);
+public class TelegramBotApiRequestsSender implements SafeCallable {
+
 	/** Все запросы к Telegram Bot API должны осуществляться через HTTPS */
 	private String apiUrl = "http://api.telegram.org/bot";
 
 	@Value("${telegram.bot.longPoolingTimeout}")
 	private String apiTimeout;
+
+	@Value("${app.use-proxy}")
+	private boolean useProxy;
+
+	@Value("${app.proxy.host}")
+	private String proxyHost;
+
+	@Value("${app.proxy.port}")
+	private int proxyPort;
 
 	private String getRequestUrl(AbstractTelegramBot bot) {
 		return apiUrl + bot.getToken() + "/";
@@ -45,8 +54,6 @@ public class TelegramBotApiRequestsSender {
 	 * @return возвращает ответ на запрос sendMessage
 	 */
 	public JSONObject sendMessage(AbstractTelegramBot bot, int chatId, String text) {
-		LOGGER.debug("sendMessage = ");
-
 		return safeCall(() -> (JSONObject) sendGet(bot, "sendMessage?chat_id=" + chatId + "&text=" + URLEncoder.encode(text, "UTF-8")));
 	}
 
@@ -81,8 +88,6 @@ public class TelegramBotApiRequestsSender {
 		LOGGER.info("sending request at: " + requestUrl);
 
 		HttpPost post = new HttpPost(requestUrl);
-		LOGGER.info("post: " + post);
-
 		post.setEntity(new StringEntity(json.toString(), "UTF-8"));
 		post.setHeader("Accept", "application/json");
 		post.setHeader("Content-Type", "application/json");
@@ -104,16 +109,24 @@ public class TelegramBotApiRequestsSender {
 
 		LOGGER.info("sending request at: " + requestUrl);
 
-		/** создание объекта HttpGet строки запроса для метода Telegram Bot API sendMessage */
-		HttpGet httpget = new HttpGet(requestUrl);
-		LOGGER.debug("httpget= " + httpget);
-
-
-		/** org.apache.http.impl.client.InternalHttpClient@67302d01 */
 		HttpClient client = HttpClients.createDefault();
+		HttpResponse resp;
 
+		if (useProxy) {
+			String requestString = "/bot" + bot.getToken() + "/" + methodNameAndUrlParams;
+			HttpHost target = new HttpHost("api.telegram.org", 443, "https");
+			HttpHost proxy = new HttpHost(proxyHost, proxyPort, "http");
 
-		HttpResponse resp = client.execute(httpget);
+			RequestConfig config = RequestConfig.custom()
+					.setProxy(proxy)
+					.build();
+			HttpGet request = new HttpGet(requestString);
+			request.setConfig(config);
+			resp = client.execute(target, request);
+		} else {
+			HttpGet httpget = new HttpGet(requestUrl);
+			resp = client.execute(httpget);
+		}
 
 		return parseResponse(resp, requestUrl);
 	}
@@ -126,9 +139,6 @@ public class TelegramBotApiRequestsSender {
 	 */
 	private Object parseResponse(HttpResponse response, String requestUrl) throws Exception {
 		String content = getContent(response.getEntity().getContent());
-		LOGGER.debug("content= " + content);
-
-
 		JSONObject json = new JSONObject(content);
 		if (json.getBoolean("ok")) {
 			return json.get("result");
@@ -150,19 +160,4 @@ public class TelegramBotApiRequestsSender {
 		return result;
 	}
 
-	/**
-	 * безопасный вызов метода с проверкой всех исключений
-	 * @return возвращает ???? joson
-	 */
-	private JSONObject safeCall(Callable<JSONObject> lambda) {
-		try {
-			return lambda.call();
-		} catch (Exception e) {
-			LOGGER.error("Exception occurred while processing callable function", e);
-
-			JSONObject resp = new JSONObject();
-			resp.put("error", e.getLocalizedMessage());
-			return resp;
-		}
-	}
 }

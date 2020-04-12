@@ -2,15 +2,13 @@ package com.example.telegrambotspring.services;
 
 import com.example.telegrambotspring.entities.SongVerse;
 import com.example.telegrambotspring.repositories.SongsRepository;
+import com.example.telegrambotspring.utils.SafeCallable;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.concurrent.Callable;
 
 
 /**
@@ -22,10 +20,10 @@ import java.util.concurrent.Callable;
  * @see     com.example.telegrambotspring.services.DatabaseResponseService
  * @version 1.0.1
  */
+
+
 @Service
-public class DatabaseService {
-	/** переменная для записи логов  */
-	private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseService.class);
+public class DatabaseService implements SafeCallable {
 
 	/** объект класса репоизиторий - класс реализующий логику работы с БД */
 	private SongsRepository repository;
@@ -136,21 +134,6 @@ public class DatabaseService {
 		});
 	}
 
-	/**
-	 * безопасный вызов метода с проверкой всех исключений
-	 * @return возвращает полученный список преобразованный в joson
-	 */
-	private JSONObject safeCall(Callable<JSONObject> lambda) {
-		try {
-			return lambda.call();
-		} catch (Exception e) {
-			LOGGER.error("Exception occurred while processing callable function", e);
-
-			JSONObject resp = new JSONObject();
-			resp.put("error", e.getLocalizedMessage());
-			return resp;
-		}
-	}
 
 	/**
 	 * Метод выполняет проверку, что имя исполнителя и название песни полученные в запросе совпадают

@@ -70,15 +70,19 @@ public class SendResponsesService {
 			try {
 				/**  цикл пока не будет установлен флаг прерывания потока */
 				while (!Thread.currentThread().isInterrupted()) {
-					sendResponses(bot);
+					try {
+						sendResponses(bot);
+					} catch (Exception e) {
+						LOGGER.debug("Exception occurred while sending responses", e);
+					}
 
 					TimeUnit.MILLISECONDS.sleep(Math.min(
 							sendMessageLatencyGroup,
 							sendMessageLatencyDirect));
 				}
-			} catch (Exception e) {
+			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
-				LOGGER.debug("Exception occurred while sending responses");
+				LOGGER.debug("Thread " + Thread.currentThread().getName() + " was interrupted");
 			}
 		};
 		executor.execute(runnable);
