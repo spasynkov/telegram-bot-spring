@@ -1,9 +1,14 @@
 package com.example.telegrambotspring.services;
 
-import com.example.telegrambotspring.entities.bots.AbstractTelegramBot;
-import com.example.telegrambotspring.utils.SafeCallable;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -13,10 +18,8 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import com.example.telegrambotspring.entities.bots.AbstractTelegramBot;
+import com.example.telegrambotspring.utils.SafeCallable;
 
 @Service
 public class TelegramBotApiRequestsSender implements SafeCallable {
@@ -26,6 +29,15 @@ public class TelegramBotApiRequestsSender implements SafeCallable {
 
 	@Value("${telegram.bot.longPoolingTimeout}")
 	private String apiTimeout;
+
+	@Value("${app.use-proxy}")
+	private boolean useProxy;
+
+	@Value("${app.proxy.host}")
+	private String proxyHost;
+
+	@Value("${app.proxy.port}")
+	private int proxyPort;
 
 	private String getRequestUrl(AbstractTelegramBot bot) {
 		return apiUrl + bot.getToken() + "/";
@@ -84,9 +96,24 @@ public class TelegramBotApiRequestsSender implements SafeCallable {
 
 		LOGGER.info("sending request at: " + requestUrl);
 
-		HttpGet httpget = new HttpGet(requestUrl);
 		HttpClient client = HttpClients.createDefault();
-		HttpResponse resp = client.execute(httpget);
+		HttpResponse resp;
+
+		if (useProxy) {
+			String requestString = "bot" + bot.getToken() + "/" + methodNameAndUrlParams;
+			HttpHost target = new HttpHost("api.telegram.org", 443, "https");
+			HttpHost proxy = new HttpHost(proxyHost, proxyPort, "http");
+
+			RequestConfig config = RequestConfig.custom()
+					.setProxy(proxy)
+					.build();
+			HttpGet request = new HttpGet(requestString);
+			request.setConfig(config);
+			resp = client.execute(target, request);
+		} else {
+			HttpGet httpget = new HttpGet(requestUrl);
+			resp = client.execute(httpget);
+		}
 
 		return parseResponse(resp, requestUrl);
 	}
