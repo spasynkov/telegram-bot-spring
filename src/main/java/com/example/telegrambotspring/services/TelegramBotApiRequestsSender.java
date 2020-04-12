@@ -24,7 +24,7 @@ import java.util.concurrent.Callable;
 public class TelegramBotApiRequestsSender {
 	private static final Logger LOGGER = LoggerFactory.getLogger(TelegramBotApiRequestsSender.class);
 	/** Все запросы к Telegram Bot API должны осуществляться через HTTPS */
-	private String apiUrl = "https://api.telegram.org/bot";
+	private String apiUrl = "http://api.telegram.org/bot";
 
 	@Value("${telegram.bot.longPoolingTimeout}")
 	private String apiTimeout;
