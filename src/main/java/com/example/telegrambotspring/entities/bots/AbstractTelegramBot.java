@@ -1,8 +1,8 @@
 package com.example.telegrambotspring.entities.bots;
 
-import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
-
+import com.example.telegrambotspring.entities.Received;
+import com.example.telegrambotspring.services.ResponseService;
+import com.example.telegrambotspring.services.TelegramBotApiRequestsSender;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -10,14 +10,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 
-import com.example.telegrambotspring.entities.Chat;
-import com.example.telegrambotspring.services.ResponseService;
-import com.example.telegrambotspring.services.TelegramBotApiRequestsSender;
-import com.example.telegrambotspring.utils.Pair;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicLong;
 
 public abstract class AbstractTelegramBot {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractTelegramBot.class);
-	protected final Map<Chat, Pair<Long, String>> answersForChats;
+	protected Received received;
 	protected String token;
 	protected AtomicLong offset = new AtomicLong(0);
 	protected long lastUpdateTime;
@@ -25,9 +26,9 @@ public abstract class AbstractTelegramBot {
 	@Autowired
 	protected MessageSource messageSource;
 
-	public AbstractTelegramBot(String token, Map<Chat, Pair<Long, String>> answersForChats, UpdatesStrategy strategy) {
+	public AbstractTelegramBot(String token, Received received, UpdatesStrategy strategy) {
 		this.token = token;
-		this.answersForChats = answersForChats;
+		this.received = received;
 		this.strategy = strategy;
 	}
 
@@ -53,7 +54,7 @@ public abstract class AbstractTelegramBot {
 		if (o == null || getClass() != o.getClass()) return false;
 		SongsBot bot = (SongsBot) o;
 		return lastUpdateTime == bot.lastUpdateTime &&
-				Objects.equals(answersForChats, bot.answersForChats) &&
+				Objects.equals(received, bot.received) &&
 				Objects.equals(token, bot.token) &&
 				Objects.equals(offset, bot.offset) &&
 				strategy == bot.strategy;
@@ -61,7 +62,7 @@ public abstract class AbstractTelegramBot {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(answersForChats, token, offset, lastUpdateTime, strategy);
+		return Objects.hash(received, token, offset, lastUpdateTime, strategy);
 	}
 
 	@Override

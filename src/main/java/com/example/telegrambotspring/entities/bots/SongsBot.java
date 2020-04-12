@@ -1,16 +1,18 @@
 package com.example.telegrambotspring.entities.bots;
 
-import com.example.telegrambotspring.entities.Chat;
+import com.example.telegrambotspring.entities.Received;
 import com.example.telegrambotspring.services.ResponseService;
 import com.example.telegrambotspring.services.TelegramBotApiRequestsSender;
-import com.example.telegrambotspring.utils.Pair;
 import com.example.telegrambotspring.utils.Utils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 
 public class SongsBot extends AbstractTelegramBot {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SongsBot.class);
@@ -18,8 +20,8 @@ public class SongsBot extends AbstractTelegramBot {
 	private boolean isMasterModeOn = false;
 	private boolean isAddSongOn = false;
 
-	public SongsBot(String token, Map<Chat, Pair<Long, String>> answersForChats, UpdatesStrategy strategy) {
-		super(token, answersForChats, strategy);
+	public SongsBot(String token, Received received, UpdatesStrategy strategy) {
+		super(token, received, strategy);
 	}
 
 	@Override
@@ -136,8 +138,8 @@ public class SongsBot extends AbstractTelegramBot {
 		if (response != null && !response.isEmpty()) {
 			JSONObject chat = message.getJSONObject("chat");
 			int chatId = chat.getInt("id");
-			String type = chat.getString("type");
-			answersForChats.put(new Chat(chatId, type), new Pair<>(date, response));
+			boolean type = chat.getString("type").equalsIgnoreCase("group");
+			received.addMessage(chatId, type, response, date);
 		}
 	}
 }
