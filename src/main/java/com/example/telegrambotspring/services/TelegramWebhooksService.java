@@ -41,19 +41,7 @@ public class TelegramWebhooksService implements SafeCallable {
 
 			JSONObject json = new JSONObject(jsonString);
 			try {
-				int chatId = Integer.parseInt(json.optJSONObject("message")
-						.optJSONObject("chat")
-						.optString("id", ""));
-				boolean chatType = json.optJSONObject("message")
-						.optJSONObject("chat")
-						.optString("type")
-						.equalsIgnoreCase("group");
-				String chatText = json.optJSONObject("message")
-						.optString("text", "");
-				long chatDate = Long.parseLong(json.optJSONObject("message")
-						.optString("date", ""));
-				received.addMessage(chatId, chatType, chatText, chatDate);
-//				bot.processUpdates(responseService, requestsSender, json);
+				received.addMessage(json);
 			} catch (Exception e) {
 				String errorText = "Unable to process message";
 				LOGGER.debug(errorText, e);

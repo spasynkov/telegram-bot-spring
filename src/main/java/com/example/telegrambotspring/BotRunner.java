@@ -1,11 +1,10 @@
 package com.example.telegrambotspring;
 
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
+import com.example.telegrambotspring.entities.Message;
+import com.example.telegrambotspring.entities.Received;
+import com.example.telegrambotspring.entities.bots.AbstractTelegramBot;
+import com.example.telegrambotspring.services.ResponseService;
+import com.example.telegrambotspring.services.TelegramBotApiRequestsSender;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,9 +15,8 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
-import com.example.telegrambotspring.entities.bots.AbstractTelegramBot;
-import com.example.telegrambotspring.services.ResponseService;
-import com.example.telegrambotspring.services.TelegramBotApiRequestsSender;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class BotRunner implements CommandLineRunner {
@@ -28,20 +26,21 @@ public class BotRunner implements CommandLineRunner {
 	private final TelegramBotApiRequestsSender requestsSender;
 	private final ResponseService responseService;
 	private final List<AbstractTelegramBot> bots;
-
+	private final Received received;
 	@Value("${app.getting-updates-latency}")
 	private long latencyBetweenGettingUpdates;
 
 	@Autowired
 	public BotRunner(ThreadPoolTaskExecutor executor,
 	                 TelegramBotApiRequestsSender requestsSender,
-	                 ResponseService responseService,
+	                 ResponseService responseService, Received received,
 	                 AbstractTelegramBot... bots) {
 
 		this.executor = executor;
 		this.requestsSender = requestsSender;
 		this.responseService = responseService;
 		this.bots = new LinkedList<>(Arrays.asList(bots));
+		this.received = received;
 	}
 
 	@Override
@@ -66,9 +65,12 @@ public class BotRunner implements CommandLineRunner {
 							LOGGER.warn("Exception while bot sleep (" + bot + ")", e);
 							break;
 						}
-
+						Map<Integer, List<Message>> messages = received.getMessages();
+						Message message = messages.get(0).get(messages.get(0).size() - 1);
 						List<JSONObject> updates = bot.getUpdates(requestsSender);
-						bot.processUpdates(responseService, requestsSender, updates.toArray(new JSONObject[0]));
+						if (message.getType().equalsIgnoreCase("group"))
+							bot.processUpdatesGroup(responseService, message);
+						else bot.processUpdatesDirect(requestsSender, message);
 					}
 				} catch (Exception e) {
 					LOGGER.error("Unable to get or process updates by " + bot + ". Stopping bot...", e);

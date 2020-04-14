@@ -4,11 +4,19 @@ import java.util.Objects;
 
 public class Message {
 	private String text;
-	private long data;
+	private long time;
+	private String type;
+	private long updateId;
+	private String languageCode;
+	private int chatId;
 
-	public Message(String text, long data) {
+	Message(String type, String text, long time, long updateId, String languageCode, int chatId) {
 		this.text = text;
-		this.data = data;
+		this.time = time;
+		this.type = type;
+		this.updateId = updateId;
+		this.languageCode = languageCode;
+		this.chatId = chatId;
 	}
 
 	public String getText() {
@@ -19,12 +27,24 @@ public class Message {
 		this.text = text;
 	}
 
-	public long getData() {
-		return data;
+	public long getTime() {
+		return time;
 	}
 
-	public void setData(long data) {
-		this.data = data;
+	public String getType() {
+		return type;
+	}
+
+	public long getUpdateId() {
+		return updateId;
+	}
+
+	public String getLanguageCode() {
+		return languageCode;
+	}
+
+	public int getChatId() {
+		return chatId;
 	}
 
 	@Override
@@ -32,20 +52,23 @@ public class Message {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		Message message = (Message) o;
-		return data == message.data &&
-				text.equals(message.text);
+		return time == message.time &&
+
+				text.equals(message.text) &&
+				type.equals(message.type);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(text, data);
+		return Objects.hash(text, time, type);
 	}
 
 	@Override
 	public String toString() {
 		return "Message{" +
 				"text='" + text + '\'' +
-				", data=" + data +
+				", time=" + time +
+				", type='" + type + '\'' +
 				'}';
 	}
 }

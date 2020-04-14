@@ -1,5 +1,6 @@
 package com.example.telegrambotspring.entities.bots;
 
+import com.example.telegrambotspring.entities.Message;
 import com.example.telegrambotspring.entities.Received;
 import com.example.telegrambotspring.services.ResponseService;
 import com.example.telegrambotspring.services.TelegramBotApiRequestsSender;
@@ -50,11 +51,11 @@ public class SongsBot extends AbstractTelegramBot {
 	}
 
 	@Override
-	protected void processDirectMessage(TelegramBotApiRequestsSender requestsSender, JSONObject update) throws Exception {
-		JSONObject message = update.getJSONObject("message");
-		String lang = message.getJSONObject("from").getString("language_code");
-		String text = message.getString("text");
-		int chatId = message.getJSONObject("chat").getInt("id");
+	protected void processDirectMessage(TelegramBotApiRequestsSender requestsSender, Message update) throws Exception {
+
+		String lang = update.getLanguageCode();
+		String text = update.getText();
+		int chatId = update.getChatId();
 
 		String normalizedText = Utils.normalizeString(text);
 		if ("master".equals(normalizedText)) {
@@ -114,32 +115,26 @@ public class SongsBot extends AbstractTelegramBot {
 		requestsSender.sendMessage(this, chatId, getMessageString("greeting", lang), json);
 	}
 
-	private void sendNotImplemented(TelegramBotApiRequestsSender requestsSender, JSONObject update) throws Exception {
-		int chatId = update.getJSONObject("message").getJSONObject("chat").getInt("id");
+	private void sendNotImplemented(TelegramBotApiRequestsSender requestsSender, Message update) throws Exception {
+		int chatId = update.getChatId();
 		requestsSender.sendMessage(this, chatId, "Not implemented yet!");
 	}
 
-	protected void processGroupMessage(ResponseService responseService, JSONObject update) {
-		JSONObject message = update.getJSONObject("message");
-
-		long date = message.getLong("date");
-		if (System.currentTimeMillis() - Utils._1_MINUTE > date * Utils.MILLIS_MULTIPLIER) {
+	protected String processGroupMessage(ResponseService responseService, Message message) {
+		long time = message.getTime();
+		if (System.currentTimeMillis() - Utils._1_MINUTE > time * Utils.MILLIS_MULTIPLIER) {
 			LOGGER.debug("Skipping message as it's too old");
-			return;
+			return null;
 		}
 
-		String text = message.optString("text", "");
+		String text = message.getText();
 		String response = null;
 		try {
 			response = responseService.getResponse(text);
 		} catch (Exception e) {
 			LOGGER.error("Unable to find suitable response", e);
 		}
-		if (response != null && !response.isEmpty()) {
-			JSONObject chat = message.getJSONObject("chat");
-			int chatId = chat.getInt("id");
-			boolean type = chat.getString("type").equalsIgnoreCase("group");
-			received.addMessage(chatId, type, response, date);
-		}
+		return response;
 	}
 }
+

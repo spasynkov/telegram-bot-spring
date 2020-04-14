@@ -1,5 +1,6 @@
 package com.example.telegrambotspring.entities.bots;
 
+import com.example.telegrambotspring.entities.Message;
 import com.example.telegrambotspring.entities.Received;
 import com.example.telegrambotspring.services.ResponseService;
 import com.example.telegrambotspring.services.TelegramBotApiRequestsSender;
@@ -91,49 +92,65 @@ public abstract class AbstractTelegramBot {
 		return result;
 	}
 
-	public void processUpdates(ResponseService responseService, TelegramBotApiRequestsSender requestsSender, JSONObject... updates) {
-		for (JSONObject update : updates) {
-			String chatType = update.optJSONObject("message")
-					.optJSONObject("chat")
-					.optString("type", "");
+	/**
+	 * This is problem point.
+	 * We did have one method "processUpdates" with return type void.
+	 * I am need return type - String, but for this it is necessary "processDirectMessage" must return String. I don't have idea.
+	 *
+	 * @param requestsSender
+	 * @param updates
+	 */
+
+	public void processUpdatesDirect(TelegramBotApiRequestsSender requestsSender, Message... updates) {
+		for (Message update : updates) {
+			String chatType = update.getType();
 
 			if (chatType.isEmpty()) {
 				LOGGER.debug("Unable to get chat type: " + update);
 				continue;
 			}
 
-			boolean processed = true;
-
-			if ("private".equalsIgnoreCase(chatType)) {
-				try {
-					processDirectMessage(requestsSender, update);
-				} catch (Exception e) {
-					processed = false;
-					LOGGER.error("Unable to process direct message", e);
-				}
-			} else {
-				try {
-					processGroupMessage(responseService, update);
-				} catch (Exception e) {
-					processed = false;
-					LOGGER.error("Unable to process group message", e);
-				}
-			}
-
-			if (processed) {
-				long update_id = update.getLong("update_id");
+			try {
+				processDirectMessage(requestsSender, update);
+				long update_id = update.getUpdateId();
 				offset = new AtomicLong(update_id);
+			} catch (Exception e) {
+				LOGGER.error("Unable to process direct message", e);
 			}
+
 		}
 	}
+
+	public String processUpdatesGroup(ResponseService responseService, Message... updates) {
+		String processUpdate = null;
+		for (Message update : updates) {
+			String chatType = update.getType();
+
+			if (chatType.isEmpty()) {
+				LOGGER.debug("Unable to get chat type: " + update);
+				continue;
+			}
+
+			try {
+				processUpdate = processGroupMessage(responseService, update);//вернуть в ответ в sendResponseService
+
+				long update_id = update.getUpdateId();
+				offset = new AtomicLong(update_id);
+			} catch (Exception e) {
+				LOGGER.error("Unable to process group message", e);
+			}
+		}
+		return processUpdate;
+	}
+
 
 	protected String getMessageString(String messageName, String lang) {
 		return messageSource.getMessage(messageName, null, Locale.forLanguageTag(lang));
 	}
 
-	protected abstract void processDirectMessage(TelegramBotApiRequestsSender requestsSender, JSONObject update) throws Exception;
+	protected abstract void processDirectMessage(TelegramBotApiRequestsSender requestsSender, Message update) throws Exception;
 
-	protected abstract void processGroupMessage(ResponseService responseService, JSONObject update);
+	protected abstract String processGroupMessage(ResponseService responseService, Message update);
 
 	public enum UpdatesStrategy {
 		LONG_POOLING,

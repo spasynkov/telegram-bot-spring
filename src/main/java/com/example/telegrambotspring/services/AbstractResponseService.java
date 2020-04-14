@@ -9,6 +9,7 @@ import java.util.List;
 public abstract class AbstractResponseService implements ResponseService {
 	protected List<SongVerse> sets = new LinkedList<>();
 
+	// поиск ответа
 	@Override
 	public String getResponse(String... textParts) throws Exception {
 		if (sets.isEmpty()) updateSongVerses(null);

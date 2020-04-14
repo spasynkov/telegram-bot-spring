@@ -1,6 +1,5 @@
 package com.example.telegrambotspring.services;
 
-import com.example.telegrambotspring.entities.Chat;
 import com.example.telegrambotspring.entities.Message;
 import com.example.telegrambotspring.entities.Received;
 import com.example.telegrambotspring.entities.bots.SongsBot;
@@ -23,6 +22,7 @@ public class SendResponsesService {
 
 	private TelegramBotApiRequestsSender requestsSender;
 	private Received received;
+	private ResponseService responseService;
 
 	@Value("${app.send-message-latency.group}")
 	private long sendMessageLatencyGroup;
@@ -33,9 +33,10 @@ public class SendResponsesService {
 	@Autowired
 	public SendResponsesService(Received received,
 	                            SongsBot bot,    // TODO: hardcoded bot instance. rewrite with chat response object
-	                            TelegramBotApiRequestsSender requestsSender, ThreadPoolTaskExecutor executor) {
+	                            TelegramBotApiRequestsSender requestsSender, ThreadPoolTaskExecutor executor, ResponseService responseService) {
 		this.received = received;
 		this.requestsSender = requestsSender;
+		this.responseService = responseService;
 
 
 		Runnable runnable = () -> {
@@ -56,22 +57,29 @@ public class SendResponsesService {
 	}
 
 	private void sendResponses(SongsBot bot) {
-		Iterator<Map.Entry<Chat, List<Message>>> iterator = received.getIncomingMessage().entrySet().iterator();
+		Iterator<Map.Entry<Integer, List<Message>>> iterator = received.getMessages().entrySet().iterator();
 		while (iterator.hasNext()) {
-			Map.Entry<Chat, List<Message>> entry = iterator.next();
-			int chatId = entry.getKey().getChatId();
-			String textMessage = entry.getValue().get(entry.getValue().size() - 1).getText();
-			long lastMessageTime = entry.getValue().get(entry.getValue().size() - 1).getData();
+			Map.Entry<Integer, List<Message>> entry = iterator.next();
+			int indexLastMessage = entry.getValue().size() - 1;
+			int chatId = entry.getKey();
+			Message message = entry.getValue().get(indexLastMessage);
+			String textMessage = message.getText();
+			long timeMessage = message.getTime();
+			String typeMessage = message.getType();
 
-
-			long latency = entry.getKey().isGroup()
+			long latency = typeMessage.equalsIgnoreCase("group")
 					? sendMessageLatencyGroup
 					: sendMessageLatencyDirect;
 
-			if (lastMessageTime * Utils.MILLIS_MULTIPLIER < System.currentTimeMillis() - latency) {
+			if (timeMessage * Utils.MILLIS_MULTIPLIER < System.currentTimeMillis() - latency) {
 				try {
-					requestsSender.sendMessage(bot, chatId, textMessage);
-					iterator.remove();
+					if (typeMessage.equalsIgnoreCase("group")) {
+						String response = bot.processUpdatesGroup(responseService, message);
+						requestsSender.sendMessage(bot, chatId, response);
+						iterator.remove();
+					} else {
+						bot.processUpdatesDirect(requestsSender, message);
+					}
 				} catch (Exception e) {
 					LOGGER.error("Unable to send response or delete chat from map", e);
 				}
