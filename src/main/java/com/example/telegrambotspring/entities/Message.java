@@ -53,14 +53,16 @@ public class Message {
 		if (o == null || getClass() != o.getClass()) return false;
 		Message message = (Message) o;
 		return time == message.time &&
-
+				updateId == message.updateId &&
+				chatId == message.chatId &&
 				text.equals(message.text) &&
-				type.equals(message.type);
+				type.equals(message.type) &&
+				languageCode.equals(message.languageCode);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(text, time, type);
+		return Objects.hash(text, time, type, updateId, languageCode, chatId);
 	}
 
 	@Override
@@ -69,6 +71,9 @@ public class Message {
 				"text='" + text + '\'' +
 				", time=" + time +
 				", type='" + type + '\'' +
+				", updateId=" + updateId +
+				", languageCode='" + languageCode + '\'' +
+				", chatId=" + chatId +
 				'}';
 	}
 }

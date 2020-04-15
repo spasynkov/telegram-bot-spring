@@ -61,9 +61,7 @@ public class SendResponsesService {
 		while (iterator.hasNext()) {
 			Map.Entry<Integer, List<Message>> entry = iterator.next();
 			int indexLastMessage = entry.getValue().size() - 1;
-			int chatId = entry.getKey();
 			Message message = entry.getValue().get(indexLastMessage);
-			String textMessage = message.getText();
 			long timeMessage = message.getTime();
 			String typeMessage = message.getType();
 
@@ -73,13 +71,7 @@ public class SendResponsesService {
 
 			if (timeMessage * Utils.MILLIS_MULTIPLIER < System.currentTimeMillis() - latency) {
 				try {
-					if (typeMessage.equalsIgnoreCase("group")) {
-						String response = bot.processUpdatesGroup(responseService, message);
-						requestsSender.sendMessage(bot, chatId, response);
-						iterator.remove();
-					} else {
-						bot.processUpdatesDirect(requestsSender, message);
-					}
+					bot.processUpdates(requestsSender, responseService, message);
 				} catch (Exception e) {
 					LOGGER.error("Unable to send response or delete chat from map", e);
 				}

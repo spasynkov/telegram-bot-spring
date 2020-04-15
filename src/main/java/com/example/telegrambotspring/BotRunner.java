@@ -5,7 +5,6 @@ import com.example.telegrambotspring.entities.Received;
 import com.example.telegrambotspring.entities.bots.AbstractTelegramBot;
 import com.example.telegrambotspring.services.ResponseService;
 import com.example.telegrambotspring.services.TelegramBotApiRequestsSender;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,10 +66,7 @@ public class BotRunner implements CommandLineRunner {
 						}
 						Map<Integer, List<Message>> messages = received.getMessages();
 						Message message = messages.get(0).get(messages.get(0).size() - 1);
-						List<JSONObject> updates = bot.getUpdates(requestsSender);
-						if (message.getType().equalsIgnoreCase("group"))
-							bot.processUpdatesGroup(responseService, message);
-						else bot.processUpdatesDirect(requestsSender, message);
+						bot.processUpdates(requestsSender, responseService, message);
 					}
 				} catch (Exception e) {
 					LOGGER.error("Unable to get or process updates by " + bot + ". Stopping bot...", e);

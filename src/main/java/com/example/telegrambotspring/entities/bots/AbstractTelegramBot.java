@@ -101,7 +101,7 @@ public abstract class AbstractTelegramBot {
 	 * @param updates
 	 */
 
-	public void processUpdatesDirect(TelegramBotApiRequestsSender requestsSender, Message... updates) {
+	public void processUpdates(TelegramBotApiRequestsSender requestsSender, ResponseService responseService, Message... updates) {
 		for (Message update : updates) {
 			String chatType = update.getType();
 
@@ -109,38 +109,28 @@ public abstract class AbstractTelegramBot {
 				LOGGER.debug("Unable to get chat type: " + update);
 				continue;
 			}
+			boolean processed = true;
+			if ("private".equalsIgnoreCase(chatType)) {
+				try {
+					processDirectMessage(requestsSender, update);
+				} catch (Exception e) {
+					processed = false;
+					LOGGER.error("Unable to process direct message", e);
+				}
+			} else {
+				try {
+					processGroupMessage(requestsSender, responseService, update);//вернуть в ответ в sendResponseService
+				} catch (Exception e) {
+					processed = false;
+					LOGGER.error("Unable to process group message", e);
+				}
+			}
 
-			try {
-				processDirectMessage(requestsSender, update);
+			if (processed) {
 				long update_id = update.getUpdateId();
 				offset = new AtomicLong(update_id);
-			} catch (Exception e) {
-				LOGGER.error("Unable to process direct message", e);
-			}
-
-		}
-	}
-
-	public String processUpdatesGroup(ResponseService responseService, Message... updates) {
-		String processUpdate = null;
-		for (Message update : updates) {
-			String chatType = update.getType();
-
-			if (chatType.isEmpty()) {
-				LOGGER.debug("Unable to get chat type: " + update);
-				continue;
-			}
-
-			try {
-				processUpdate = processGroupMessage(responseService, update);//вернуть в ответ в sendResponseService
-
-				long update_id = update.getUpdateId();
-				offset = new AtomicLong(update_id);
-			} catch (Exception e) {
-				LOGGER.error("Unable to process group message", e);
 			}
 		}
-		return processUpdate;
 	}
 
 
@@ -150,7 +140,7 @@ public abstract class AbstractTelegramBot {
 
 	protected abstract void processDirectMessage(TelegramBotApiRequestsSender requestsSender, Message update) throws Exception;
 
-	protected abstract String processGroupMessage(ResponseService responseService, Message update);
+	protected abstract void processGroupMessage(TelegramBotApiRequestsSender requestsSender, ResponseService responseService, Message update);
 
 	public enum UpdatesStrategy {
 		LONG_POOLING,

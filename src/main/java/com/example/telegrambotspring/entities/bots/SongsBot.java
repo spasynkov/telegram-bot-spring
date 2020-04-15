@@ -120,21 +120,20 @@ public class SongsBot extends AbstractTelegramBot {
 		requestsSender.sendMessage(this, chatId, "Not implemented yet!");
 	}
 
-	protected String processGroupMessage(ResponseService responseService, Message message) {
+	protected void processGroupMessage(TelegramBotApiRequestsSender requestsSender, ResponseService responseService, Message message) {
 		long time = message.getTime();
 		if (System.currentTimeMillis() - Utils._1_MINUTE > time * Utils.MILLIS_MULTIPLIER) {
 			LOGGER.debug("Skipping message as it's too old");
-			return null;
+			return;
 		}
 
 		String text = message.getText();
-		String response = null;
 		try {
-			response = responseService.getResponse(text);
+			String response = responseService.getResponse(text);
+			requestsSender.sendMessage(this, message.getChatId(), response);
 		} catch (Exception e) {
 			LOGGER.error("Unable to find suitable response", e);
 		}
-		return response;
 	}
 }
 

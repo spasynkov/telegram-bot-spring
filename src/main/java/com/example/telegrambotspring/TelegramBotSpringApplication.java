@@ -13,10 +13,6 @@ public class TelegramBotSpringApplication {
 		SpringApplication.run(TelegramBotSpringApplication.class, args);
 	}
 
-//	@Bean
-//	public Map<Chat, List<Message>> incomingMessage() {
-//		return new ConcurrentHashMap<>();
-//	}
 
 	@Bean
 	public SongsBot songsBot(@Value("${telegram.bot.token}") String token, Received received) {

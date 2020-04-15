@@ -13,15 +13,10 @@ public class Received {
 	private Map<Integer, List<Message>> messages = new ConcurrentHashMap<>();
 
 
-//	public Received(Map<Chat, List<Message>> incomingMessage) {
-//		this.incomingMessage = incomingMessage;
-//	}
-
 	public Map<Integer, List<Message>> getMessages() {
 		return messages;
 	}
 
-	//
 	public void addMessage(JSONObject jsonObject) {
 		int chatId = getMessageChatId(jsonObject);
 		String type = getType(jsonObject);
