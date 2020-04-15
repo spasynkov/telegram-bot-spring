@@ -13,7 +13,6 @@ public class TelegramBotSpringApplication {
 		SpringApplication.run(TelegramBotSpringApplication.class, args);
 	}
 
-
 	@Bean
 	public SongsBot songsBot(@Value("${telegram.bot.token}") String token, Received received) {
 		return new SongsBot(token, received, SongsBot.UpdatesStrategy.WEBHOOKS);

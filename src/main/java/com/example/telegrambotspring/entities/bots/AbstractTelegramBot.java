@@ -92,15 +92,6 @@ public abstract class AbstractTelegramBot {
 		return result;
 	}
 
-	/**
-	 * This is problem point.
-	 * We did have one method "processUpdates" with return type void.
-	 * I am need return type - String, but for this it is necessary "processDirectMessage" must return String. I don't have idea.
-	 *
-	 * @param requestsSender
-	 * @param updates
-	 */
-
 	public void processUpdates(TelegramBotApiRequestsSender requestsSender, ResponseService responseService, Message... updates) {
 		for (Message update : updates) {
 			String chatType = update.getType();
@@ -110,7 +101,7 @@ public abstract class AbstractTelegramBot {
 				continue;
 			}
 			boolean processed = true;
-			if ("private".equalsIgnoreCase(chatType)) {
+			if (chatType.equalsIgnoreCase("private")) {
 				try {
 					processDirectMessage(requestsSender, update);
 				} catch (Exception e) {
@@ -119,7 +110,7 @@ public abstract class AbstractTelegramBot {
 				}
 			} else {
 				try {
-					processGroupMessage(requestsSender, responseService, update);//вернуть в ответ в sendResponseService
+					processGroupMessage(requestsSender, responseService, update);
 				} catch (Exception e) {
 					processed = false;
 					LOGGER.error("Unable to process group message", e);

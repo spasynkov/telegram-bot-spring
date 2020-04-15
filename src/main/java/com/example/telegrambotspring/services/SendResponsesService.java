@@ -72,6 +72,7 @@ public class SendResponsesService {
 			if (timeMessage * Utils.MILLIS_MULTIPLIER < System.currentTimeMillis() - latency) {
 				try {
 					bot.processUpdates(requestsSender, responseService, message);
+					iterator.remove();
 				} catch (Exception e) {
 					LOGGER.error("Unable to send response or delete chat from map", e);
 				}
