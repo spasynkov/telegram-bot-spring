@@ -1,5 +1,10 @@
 package com.example.telegrambotspring.entities;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Objects;
 
 
@@ -9,6 +14,10 @@ import java.util.Objects;
  * <b>chatId</b> and <b>isGroup</b>
  * @version 1.0.1
  */
+@Slf4j
+@Getter
+@ToString
+@EqualsAndHashCode
 public class Chat {
 	/** идентификатор чата */
 	private int chatId;
@@ -38,7 +47,7 @@ public class Chat {
 	/**
 	 * метод - чтение идентификатора чата
 	 * @return возвращает строку - идентификатор чата
-	 */
+
 	public int getChatId() {
 		return chatId;
 	}
@@ -46,16 +55,17 @@ public class Chat {
 	/**
 	 * метод - чтение флага принадлежности чата
 	 * @return возвращает флага принадлежности чата групповой или личный
-	 */
+
 	public boolean isGroup() {
 		return isGroup;
 	}
+
 
 	/**
 	 * переопределяем метод equals
 	 * @return возвращает boolean результат сравнения чатов по следующим полям
 	 * chatId, isGroup
-	 */
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
@@ -68,7 +78,7 @@ public class Chat {
 	/**
 	 * переопределяем метод hashCode
 	 * @return возвращает hashCode Objects
-	 */
+
 	@Override
 	public int hashCode() {
 		return Objects.hash(chatId, isGroup);
@@ -77,9 +87,10 @@ public class Chat {
 	/**
 	 * переопределяем метод toString
 	 * @return возвращает отформатированную строку
-	 */
+
 	@Override
 	public String toString() {
 		return (isGroup ? "Group" : "Chat") + "{chatId=" + chatId + '}';
 	}
+	*/
 }
