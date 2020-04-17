@@ -1,5 +1,8 @@
 package com.example.telegrambotspring.utils;
 
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Objects;
 
 
@@ -9,6 +12,8 @@ import java.util.Objects;
  * <b>first</b> and <b>second</b>
  * @version 1.0.1
  */
+@Slf4j
+@Data
 public class Pair<F, S> {
 	/** время запроса */
 	private F first;
@@ -28,14 +33,14 @@ public class Pair<F, S> {
 	/**
 	 * метод - чтение времени запроса
 	 * @return возвращает время запроса
-	 */
+
 	public F getFirst() {
 		return first;
 	}
 
 	/**
 	 * метод - запись времени запроса
-	 */
+
 	public void setFirst(F first) {
 		this.first = first;
 	}
@@ -43,14 +48,14 @@ public class Pair<F, S> {
 	/**
 	 * метод - чтение текста ответа
 	 * @return возвращает текст ответа
-	 */
+
 	public S getSecond() {
 		return second;
 	}
 
 	/**
 	 * метод - запись текста ответа
-	 */
+
 	public void setSecond(S second) {
 		this.second = second;
 	}
@@ -59,7 +64,7 @@ public class Pair<F, S> {
 	 * переопределяем метод equals
 	 * @return возвращает boolean результат сравнения чатов по следующим полям
 	 * first, second
-	 */
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
@@ -72,7 +77,7 @@ public class Pair<F, S> {
 	/**
 	 * переопределяем метод hashCode
 	 * @return возвращает hashCode Objects
-	 */
+
 	@Override
 	public int hashCode() {
 		return Objects.hash(first, second);
@@ -81,9 +86,10 @@ public class Pair<F, S> {
 	/**
 	 * переопределяем метод toString
 	 * @return возвращает отформатированную строку
-	 */
+
 	@Override
 	public String toString() {
 		return String.format("Pair{first=%s, second=%s}", first, second);
 	}
+	*/
 }
