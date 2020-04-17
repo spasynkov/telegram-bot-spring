@@ -3,10 +3,15 @@ package com.example.telegrambotspring.entities.bots;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.log;
+//import org.slf4j.logFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 
@@ -22,9 +27,14 @@ import com.example.telegrambotspring.utils.Pair;
  * @see     com.example.telegrambotspring.entities.bots.SongsBot
  * @version 1.0.1
  */
+@Getter
+@ToString(exclude = { "messageSource", "answersForChats" })
+@Slf4j
+@EqualsAndHashCode(exclude = { "messageSource" })
 public abstract class AbstractTelegramBot {
-	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractTelegramBot.class);
+//	private static final log log = logFactory.getlog(AbstractTelegramBot.class);
 	/** мапа содержашая все ответы в чат */
+	@Getter(AccessLevel.NONE)
 	protected final Map<Chat, Pair<Long, String>> answersForChats;
 	/** идентификатор для доступа к боту */
 	protected String token;
@@ -40,7 +50,6 @@ public abstract class AbstractTelegramBot {
 	/** ??? */
 	@Autowired
 	protected MessageSource messageSource;
-
 
 	/**
 	 * Конструктор абстрактного класса - создание нового объекта с определенными значениями
@@ -58,37 +67,37 @@ public abstract class AbstractTelegramBot {
 	 * Метод получения токина
 	 * @return возвращает токин
 	 */
-	public String getToken() {
-		return token;
-	}
+//	public String getToken() {
+//		return token;
+//	}
 
 	/**
 	 * Метод получения уникального идентификатора последнего обработанного входящего обновления
 	 * @return возвращает уникального идентификатора последнего обработанного входящего обновления
 	 */
-	public AtomicLong getOffset() {
-		return offset;
-	}
+//	public AtomicLong getOffset() {
+//		return offset;
+//	}
 
 	/**
 	 * Метод получения ???
 	 * @return возвращает ???
 	 */
-	public long getLastUpdateTime() {
-		return lastUpdateTime;
-	}
+//	public long getLastUpdateTime() {
+//		return lastUpdateTime;
+//	}
 
 	/**
 	 * Метод получения режим работы бота
 	 * @return возвращает режим работы бота
 	 */
-	public UpdatesStrategy getStrategy() {
-		return strategy;
-	}
+//	public UpdatesStrategy getStrategy() {
+//		return strategy;
+//	}
 
 	/**
 	 * Переопределяем метод equals
-	 */
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
@@ -100,19 +109,20 @@ public abstract class AbstractTelegramBot {
 				Objects.equals(offset, bot.offset) &&
 				strategy == bot.strategy;
 	}
-
+*/
 
 	/**
 	 * Переопределяем метод hashCode
-	 */
+
 	@Override
 	public int hashCode() {
 		return Objects.hash(answersForChats, token, offset, lastUpdateTime, strategy);
 	}
+*/
 
 	/**
 	 * Переопределяем метод toString
-	 */
+
 	@Override
 	public String toString() {
 		return "Bot{" +
@@ -122,6 +132,7 @@ public abstract class AbstractTelegramBot {
 				", strategy=" + strategy +
 				'}';
 	}
+	*/
 
 	public List<JSONObject> getUpdates(TelegramBotApiRequestsSender requestsSender) throws Exception {
 		JSONArray updates = requestsSender.getUpdates(this);
@@ -130,7 +141,7 @@ public abstract class AbstractTelegramBot {
 		List<JSONObject> result = new LinkedList<>();
 		for (Object o : updates) {
 			if (!(o instanceof JSONObject)) {
-				LOGGER.debug(o + " is not JSONObject");
+				log.debug(o + " is not JSONObject");
 				continue;
 			}
 			result.add((JSONObject) o);
@@ -153,7 +164,7 @@ public abstract class AbstractTelegramBot {
 					.optString("type", "");
 
 			if (chatType.isEmpty()) {
-				LOGGER.debug("Unable to get chat type: " + update);
+				log.debug("Unable to get chat type: " + update);
 				continue;
 			}
 			/** флаг процесса обработки запроса */
@@ -164,17 +175,17 @@ public abstract class AbstractTelegramBot {
 					processDirectMessage(requestsSender, update);
 				} catch (Exception e) {
 					processed = false;
-					LOGGER.error("Unable to process direct message", e);
+					log.error("Unable to process direct message", e);
 				}
 			} else {
 				try {
-					LOGGER.debug("responseService " + responseService);
-					LOGGER.debug("update " + update);
+					log.debug("responseService " + responseService);
+					log.debug("update " + update);
 
 					processGroupMessage(responseService, update);
 				} catch (Exception e) {
 					processed = false;
-					LOGGER.error("Unable to process group message", e);
+					log.error("Unable to process group message", e);
 				}
 			}
 			/** если процесс обработки запроса прошел без ошибок*/
