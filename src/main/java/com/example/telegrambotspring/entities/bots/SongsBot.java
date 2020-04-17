@@ -5,6 +5,9 @@ import com.example.telegrambotspring.services.ResponseService;
 import com.example.telegrambotspring.services.TelegramBotApiRequestsSender;
 import com.example.telegrambotspring.utils.Pair;
 import com.example.telegrambotspring.utils.Utils;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -22,8 +25,11 @@ import java.util.*;
  * @see     com.example.telegrambotspring.entities.bots.AbstractTelegramBot
  * @version 1.0.1
  */
+@Slf4j
+@ToString
+@EqualsAndHashCode
 public class SongsBot extends AbstractTelegramBot {
-	private static final Logger LOGGER = LoggerFactory.getLogger(SongsBot.class);
+//	private static final Logger LOGGER = LoggerFactory.getLogger(SongsBot.class);
 
 	private boolean isMasterModeOn = false;
 	private boolean isAddSongOn = false;
@@ -36,7 +42,7 @@ public class SongsBot extends AbstractTelegramBot {
 	 * переопределяем метод equals
 	 * @return возвращает boolean результат сравнения чатов по следующим полям
 	 * isMasterModeOn, isAddSongOn
-	 */
+	 *
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
@@ -50,7 +56,7 @@ public class SongsBot extends AbstractTelegramBot {
 	/**
 	 * переопределяем метод hashCode
 	 * @return возвращает hashCode Objects
-	 */
+	 *
 	@Override
 	public int hashCode() {
 		return Objects.hash(super.hashCode(), isMasterModeOn, isAddSongOn);
@@ -59,7 +65,7 @@ public class SongsBot extends AbstractTelegramBot {
 	/**
 	 * переопределяем метод toString
 	 * @return возвращает отформатированную строку
-	 */
+	 *
 	@Override
 	public String toString() {
 		String string = super.toString();
@@ -69,6 +75,7 @@ public class SongsBot extends AbstractTelegramBot {
 				(isAddSongOn ? ", isAddSongOn=true" : "") +
 				'}';
 	}
+	 */
 
 	@Override
 	protected void processDirectMessage(TelegramBotApiRequestsSender requestsSender, JSONObject update) throws Exception {
@@ -150,31 +157,31 @@ public class SongsBot extends AbstractTelegramBot {
 
 		/**  прочитаем текст сообщения */
 		JSONObject message = update.getJSONObject("message");
-		LOGGER.debug("update" + update);
-		LOGGER.debug("message" + message);
+		log.debug("update" + update);
+		log.debug("message" + message);
 
 		/**  время формирования сообщения */
 		long date = message.getLong("date");
 
 		/**  проверка актуальности сообщения - т.е. сообщение сформировано не более 1мин назад */
 		if (System.currentTimeMillis() - Utils._1_MINUTE > date * Utils.MILLIS_MULTIPLIER) {
-			LOGGER.debug("Skipping message as it's too old");
+			log.debug("Skipping message as it's too old");
 			return;
 		}
 
 		/**  текст сообщения */
 		String text = message.optString("text", "");
-		LOGGER.debug("text " + text);
+		log.debug("text " + text);
 
 		/**  текст ответа */
 		String response = null;
 		try {
 			/**  формирование ответа */
 			response = responseService.getResponse(text);
-			LOGGER.debug("text ->response " + response);
+			log.debug("text ->response " + response);
 
 		} catch (Exception e) {
-			LOGGER.error("Unable to find suitable response", e);
+			log.error("Unable to find suitable response", e);
 		}
 		if (response != null && !response.isEmpty()) {
 			/** получаем структуру данных по чату */
@@ -183,7 +190,7 @@ public class SongsBot extends AbstractTelegramBot {
 			int chatId = chat.getInt("id");
 			/** получаем принадлежность чата */
 			String type = chat.getString("type");
-			LOGGER.debug("new Pair<>(date, response)" + new Pair<>(date, response));
+			log.debug("new Pair<>(date, response)" + new Pair<>(date, response));
 
 			/**
 			 * создаем новый объект чата
