@@ -1,5 +1,10 @@
 package com.example.telegrambotspring.entities;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.annotation.Id;
 
 import java.util.Arrays;
@@ -16,6 +21,11 @@ import java.util.Objects;
  * @see     com.example.telegrambotspring.entities.Chat
  * @version 1.0.1
  */
+@Slf4j
+@Getter
+@Setter
+@ToString
+@EqualsAndHashCode(exclude = { "id" })
 public class SongVerse implements Comparable<SongVerse> {
 
 	/** идентификатор песни */
@@ -65,7 +75,7 @@ public class SongVerse implements Comparable<SongVerse> {
 	/**
 	 * метод - чтение идентификатора песни
 	 * @return возвращает строку - идентификатор песни
-	 */
+
 	public String getId() {
 		return id;
 	}
@@ -73,7 +83,7 @@ public class SongVerse implements Comparable<SongVerse> {
 	/**
 	 * метод - запись идентификатора песни
 	 * @param id - идентификатор песни
-	 */
+
 	public void setId(String id) {
 		this.id = id;
 	}
@@ -81,7 +91,7 @@ public class SongVerse implements Comparable<SongVerse> {
 	/**
 	 * метод - чтение имени исполнителя
 	 * @return возвращает строку - имя исполнителя
-	 */
+
 	public String getArtist() {
 		return artist;
 	}
@@ -89,7 +99,7 @@ public class SongVerse implements Comparable<SongVerse> {
 	/**
 	 * метод - запись имени исполнителя
 	 * @param artist - имя исполнителя
-	 */
+
 	public void setArtist(String artist) {
 		this.artist = artist;
 	}
@@ -97,7 +107,7 @@ public class SongVerse implements Comparable<SongVerse> {
 	/**
 	 * метод - чтение названия песни
 	 * @return возвращает строку - название песни
-	 */
+
 	public String getSong() {
 		return song;
 	}
@@ -105,7 +115,7 @@ public class SongVerse implements Comparable<SongVerse> {
 	/**
 	 * метод - запись названия песни
 	 * @param song - название песни
-	 */
+
 	public void setSong(String song) {
 		this.song = song;
 	}
@@ -114,7 +124,7 @@ public class SongVerse implements Comparable<SongVerse> {
 	/**
 	 * метод - чтение номера версии песни
 	 * @return возвращает целое число - номер версии песни
-	 */
+
 	public int getVerseId() {
 		return verseId;
 	}
@@ -122,7 +132,7 @@ public class SongVerse implements Comparable<SongVerse> {
 	/**
 	 * метод - запись номера версии песни
 	 * @param verseId - номер версии песни
-	 */
+
 	public void setVerseId(int verseId) {
 		this.verseId = verseId;
 	}
@@ -131,7 +141,7 @@ public class SongVerse implements Comparable<SongVerse> {
 	/**
 	 * метод - чтение текста песни - одного куплета
 	 * @return возвращает список строк - текс песни - один куплет
-	 */
+
 	public List<String> getText() {
 		return text;
 	}
@@ -139,7 +149,7 @@ public class SongVerse implements Comparable<SongVerse> {
 	/**
 	 * метод - запись текста песни - одного куплета
 	 * @param text - текс песни
-	 */
+
 	public void setText(List<String> text) {
 		this.text = text;
 	}
@@ -149,7 +159,7 @@ public class SongVerse implements Comparable<SongVerse> {
 	 * переопределяем метод equals
 	 * @return возвращает boolean результат сравнения песен по следующим полям
 	 * verseId, artist, song, text
-	 */
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
@@ -165,7 +175,7 @@ public class SongVerse implements Comparable<SongVerse> {
 	/**
 	 * переопределяем метод hashCode
 	 * @return возвращает hashCode Objects
-	 */
+
 	@Override
 	public int hashCode() {
 		return Objects.hash(artist, song, verseId, text);
@@ -174,12 +184,13 @@ public class SongVerse implements Comparable<SongVerse> {
 	/**
 	 * переопределяем метод toString
 	 * @return возвращает отформатированную строку
-	 */
+
 	@Override
 	public String toString() {
 		return String.format("SongVerse{id='%s', artist='%s', song='%s', verseId=%d, text=%s}",
 				id, artist, song, verseId, text);
 	}
+*/
 
 	/**
 	 * переопределяем метод compareTo
