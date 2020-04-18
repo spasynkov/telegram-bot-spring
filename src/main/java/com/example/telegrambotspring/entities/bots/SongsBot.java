@@ -38,45 +38,6 @@ public class SongsBot extends AbstractTelegramBot {
 		super(token, answersForChats, strategy);
 	}
 
-	/**
-	 * переопределяем метод equals
-	 * @return возвращает boolean результат сравнения чатов по следующим полям
-	 * isMasterModeOn, isAddSongOn
-	 *
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		SongsBot bot = (SongsBot) o;
-		return super.equals(o) &&
-				isMasterModeOn == bot.isMasterModeOn &&
-				isAddSongOn == bot.isAddSongOn;
-	}
-
-	/**
-	 * переопределяем метод hashCode
-	 * @return возвращает hashCode Objects
-	 *
-	@Override
-	public int hashCode() {
-		return Objects.hash(super.hashCode(), isMasterModeOn, isAddSongOn);
-	}
-
-	/**
-	 * переопределяем метод toString
-	 * @return возвращает отформатированную строку
-	 *
-	@Override
-	public String toString() {
-		String string = super.toString();
-		return "SongsBot{" +
-				string.substring(string.indexOf("{") + 1, string.lastIndexOf("}")) +
-				(isMasterModeOn ? ", isMasterModeOn=true" : "") +
-				(isAddSongOn ? ", isAddSongOn=true" : "") +
-				'}';
-	}
-	 */
-
 	@Override
 	protected void processDirectMessage(TelegramBotApiRequestsSender requestsSender, JSONObject update) throws Exception {
 		JSONObject message = update.getJSONObject("message");

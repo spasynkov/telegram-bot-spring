@@ -63,76 +63,7 @@ public abstract class AbstractTelegramBot {
 		this.strategy = strategy;
 	}
 
-	/**
-	 * Метод получения токина
-	 * @return возвращает токин
-	 */
-//	public String getToken() {
-//		return token;
-//	}
 
-	/**
-	 * Метод получения уникального идентификатора последнего обработанного входящего обновления
-	 * @return возвращает уникального идентификатора последнего обработанного входящего обновления
-	 */
-//	public AtomicLong getOffset() {
-//		return offset;
-//	}
-
-	/**
-	 * Метод получения ???
-	 * @return возвращает ???
-	 */
-//	public long getLastUpdateTime() {
-//		return lastUpdateTime;
-//	}
-
-	/**
-	 * Метод получения режим работы бота
-	 * @return возвращает режим работы бота
-	 */
-//	public UpdatesStrategy getStrategy() {
-//		return strategy;
-//	}
-
-	/**
-	 * Переопределяем метод equals
-
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		SongsBot bot = (SongsBot) o;
-		return lastUpdateTime == bot.lastUpdateTime &&
-				Objects.equals(answersForChats, bot.answersForChats) &&
-				Objects.equals(token, bot.token) &&
-				Objects.equals(offset, bot.offset) &&
-				strategy == bot.strategy;
-	}
-*/
-
-	/**
-	 * Переопределяем метод hashCode
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(answersForChats, token, offset, lastUpdateTime, strategy);
-	}
-*/
-
-	/**
-	 * Переопределяем метод toString
-
-	@Override
-	public String toString() {
-		return "Bot{" +
-				"token='" + token + '\'' +
-				", offset=" + offset +
-				", lastUpdateTime=" + lastUpdateTime +
-				", strategy=" + strategy +
-				'}';
-	}
-	*/
 
 	public List<JSONObject> getUpdates(TelegramBotApiRequestsSender requestsSender) throws Exception {
 		JSONArray updates = requestsSender.getUpdates(this);

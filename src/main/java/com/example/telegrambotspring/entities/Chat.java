@@ -44,53 +44,5 @@ public class Chat {
 		this.isGroup = "group".equalsIgnoreCase(type);
 	}
 
-	/**
-	 * метод - чтение идентификатора чата
-	 * @return возвращает строку - идентификатор чата
 
-	public int getChatId() {
-		return chatId;
-	}
-
-	/**
-	 * метод - чтение флага принадлежности чата
-	 * @return возвращает флага принадлежности чата групповой или личный
-
-	public boolean isGroup() {
-		return isGroup;
-	}
-
-
-	/**
-	 * переопределяем метод equals
-	 * @return возвращает boolean результат сравнения чатов по следующим полям
-	 * chatId, isGroup
-
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		Chat chat = (Chat) o;
-		return chatId == chat.chatId &&
-				isGroup == chat.isGroup;
-	}
-
-	/**
-	 * переопределяем метод hashCode
-	 * @return возвращает hashCode Objects
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(chatId, isGroup);
-	}
-
-	/**
-	 * переопределяем метод toString
-	 * @return возвращает отформатированную строку
-
-	@Override
-	public String toString() {
-		return (isGroup ? "Group" : "Chat") + "{chatId=" + chatId + '}';
-	}
-	*/
 }
