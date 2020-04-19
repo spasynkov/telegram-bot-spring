@@ -9,7 +9,6 @@ import com.example.telegrambotspring.services.TelegramWebhooksService;
 @RestController
 @RequestMapping(value = "/rest", method = RequestMethod.POST, produces = "application/json")
 public class TelegramApiListenerController {
-
 	private TelegramWebhooksService webhooksService;
 
 	@Autowired
