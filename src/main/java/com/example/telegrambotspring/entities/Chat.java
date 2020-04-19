@@ -1,7 +1,16 @@
 package com.example.telegrambotspring.entities;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Objects;
 
+@Slf4j
+@Getter
+@ToString
+@EqualsAndHashCode
 public class Chat {
 	private int chatId;
 	private boolean isGroup;
@@ -14,32 +23,5 @@ public class Chat {
 	public Chat(int chatId, String type) {
 		this.chatId = chatId;
 		this.isGroup = "group".equalsIgnoreCase(type);
-	}
-
-	public int getChatId() {
-		return chatId;
-	}
-
-	public boolean isGroup() {
-		return isGroup;
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		Chat chat = (Chat) o;
-		return chatId == chat.chatId &&
-				isGroup == chat.isGroup;
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(chatId, isGroup);
-	}
-
-	@Override
-	public String toString() {
-		return (isGroup ? "Group" : "Chat") + "{chatId=" + chatId + '}';
 	}
 }
