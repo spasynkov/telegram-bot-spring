@@ -3,6 +3,11 @@ package com.example.telegrambotspring.entities.bots;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -15,8 +20,13 @@ import com.example.telegrambotspring.services.ResponseService;
 import com.example.telegrambotspring.services.TelegramBotApiRequestsSender;
 import com.example.telegrambotspring.utils.Pair;
 
+@Getter
+@ToString(exclude = { "messageSource", "answersForChats" })
+@Slf4j
+@EqualsAndHashCode(exclude = { "messageSource" })
 public abstract class AbstractTelegramBot {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractTelegramBot.class);
+	@Getter(AccessLevel.NONE)
 	protected final Map<Chat, Pair<Long, String>> answersForChats;
 	protected String token;
 	protected AtomicLong offset = new AtomicLong(0);
@@ -29,49 +39,6 @@ public abstract class AbstractTelegramBot {
 		this.token = token;
 		this.answersForChats = answersForChats;
 		this.strategy = strategy;
-	}
-
-	public String getToken() {
-		return token;
-	}
-
-	public AtomicLong getOffset() {
-		return offset;
-	}
-
-	public long getLastUpdateTime() {
-		return lastUpdateTime;
-	}
-
-	public UpdatesStrategy getStrategy() {
-		return strategy;
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		SongsBot bot = (SongsBot) o;
-		return lastUpdateTime == bot.lastUpdateTime &&
-				Objects.equals(answersForChats, bot.answersForChats) &&
-				Objects.equals(token, bot.token) &&
-				Objects.equals(offset, bot.offset) &&
-				strategy == bot.strategy;
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(answersForChats, token, offset, lastUpdateTime, strategy);
-	}
-
-	@Override
-	public String toString() {
-		return "Bot{" +
-				"token='" + token + '\'' +
-				", offset=" + offset +
-				", lastUpdateTime=" + lastUpdateTime +
-				", strategy=" + strategy +
-				'}';
 	}
 
 	public List<JSONObject> getUpdates(TelegramBotApiRequestsSender requestsSender) throws Exception {
