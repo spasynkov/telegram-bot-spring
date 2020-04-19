@@ -5,46 +5,24 @@ import com.example.telegrambotspring.services.ResponseService;
 import com.example.telegrambotspring.services.TelegramBotApiRequestsSender;
 import com.example.telegrambotspring.utils.Pair;
 import com.example.telegrambotspring.utils.Utils;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
+@Slf4j
+@ToString
+@EqualsAndHashCode
 public class SongsBot extends AbstractTelegramBot {
-	private static final Logger LOGGER = LoggerFactory.getLogger(SongsBot.class);
 
 	private boolean isMasterModeOn = false;
 	private boolean isAddSongOn = false;
 
 	public SongsBot(String token, Map<Chat, Pair<Long, String>> answersForChats, UpdatesStrategy strategy) {
 		super(token, answersForChats, strategy);
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		SongsBot bot = (SongsBot) o;
-		return super.equals(o) &&
-				isMasterModeOn == bot.isMasterModeOn &&
-				isAddSongOn == bot.isAddSongOn;
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(super.hashCode(), isMasterModeOn, isAddSongOn);
-	}
-
-	@Override
-	public String toString() {
-		String string = super.toString();
-		return "SongsBot{" +
-				string.substring(string.indexOf("{") + 1, string.lastIndexOf("}")) +
-				(isMasterModeOn ? ", isMasterModeOn=true" : "") +
-				(isAddSongOn ? ", isAddSongOn=true" : "") +
-				'}';
 	}
 
 	@Override
@@ -122,7 +100,7 @@ public class SongsBot extends AbstractTelegramBot {
 
 		long date = message.getLong("date");
 		if (System.currentTimeMillis() - Utils._1_MINUTE > date * Utils.MILLIS_MULTIPLIER) {
-			LOGGER.debug("Skipping message as it's too old");
+			log.debug("Skipping message as it's too old");
 			return;
 		}
 
@@ -131,7 +109,7 @@ public class SongsBot extends AbstractTelegramBot {
 		try {
 			response = responseService.getResponse(text);
 		} catch (Exception e) {
-			LOGGER.error("Unable to find suitable response", e);
+			log.error("Unable to find suitable response", e);
 		}
 		if (response != null && !response.isEmpty()) {
 			JSONObject chat = message.getJSONObject("chat");
