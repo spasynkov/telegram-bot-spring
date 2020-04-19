@@ -15,7 +15,6 @@ import java.util.Map;
 @Service
 public class TelegramWebhooksService implements SafeCallable {
 
-
 	private ResponseService responseService;
 	private TelegramBotApiRequestsSender requestsSender;
 	private Map<Chat, Pair<Long, String>> answersForChats;
