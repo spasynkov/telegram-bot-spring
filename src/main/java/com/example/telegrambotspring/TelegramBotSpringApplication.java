@@ -16,8 +16,6 @@ import com.example.telegrambotspring.utils.Pair;
 @SpringBootApplication
 public class TelegramBotSpringApplication {
 	public static void main(String[] args) {
-		Date curTime = new Date();    //DeleteCode
-		System.out.println(curTime.getTime()/1000);
 		SpringApplication.run(TelegramBotSpringApplication.class, args);
 	}
 
