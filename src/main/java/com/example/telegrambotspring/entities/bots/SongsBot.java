@@ -15,7 +15,7 @@ import java.util.*;
 
 @Slf4j
 @ToString
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper=false)
 public class SongsBot extends AbstractTelegramBot {
 	private boolean isMasterModeOn = false;
 	private boolean isAddSongOn = false;
