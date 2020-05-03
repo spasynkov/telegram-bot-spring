@@ -1,16 +1,13 @@
 package com.example.telegrambotspring.services;
 
-import com.example.telegrambotspring.entities.Chat;
+import com.example.telegrambotspring.entities.Received;
 import com.example.telegrambotspring.entities.bots.AbstractTelegramBot;
-import com.example.telegrambotspring.utils.Pair;
 import com.example.telegrambotspring.utils.SafeCallable;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class TelegramWebhooksService implements SafeCallable {
@@ -18,17 +15,17 @@ public class TelegramWebhooksService implements SafeCallable {
 
 	private ResponseService responseService;
 	private TelegramBotApiRequestsSender requestsSender;
-	private Map<Chat, Pair<Long, String>> answersForChats;
 	private List<AbstractTelegramBot> bots;
+	private Received received;
 
 	@Autowired
 	public TelegramWebhooksService(ResponseService responseService,
 	                               TelegramBotApiRequestsSender requestsSender,
-	                               @Qualifier("answersForChats") Map<Chat, Pair<Long, String>> answersForChats,
+	                               Received received,
 	                               List<AbstractTelegramBot> bots) {
 		this.responseService = responseService;
 		this.requestsSender = requestsSender;
-		this.answersForChats = answersForChats;
+		this.received = received;
 		this.bots = bots;
 	}
 
@@ -44,7 +41,7 @@ public class TelegramWebhooksService implements SafeCallable {
 
 			JSONObject json = new JSONObject(jsonString);
 			try {
-				bot.processUpdates(responseService, requestsSender, json);
+				received.addMessage(json);
 			} catch (Exception e) {
 				String errorText = "Unable to process message";
 				LOGGER.debug(errorText, e);

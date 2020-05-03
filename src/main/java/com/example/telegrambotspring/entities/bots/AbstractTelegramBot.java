@@ -1,8 +1,9 @@
 package com.example.telegrambotspring.entities.bots;
 
-import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
-
+import com.example.telegrambotspring.entities.Message;
+import com.example.telegrambotspring.entities.Received;
+import com.example.telegrambotspring.services.ResponseService;
+import com.example.telegrambotspring.services.TelegramBotApiRequestsSender;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -10,14 +11,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 
-import com.example.telegrambotspring.entities.Chat;
-import com.example.telegrambotspring.services.ResponseService;
-import com.example.telegrambotspring.services.TelegramBotApiRequestsSender;
-import com.example.telegrambotspring.utils.Pair;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicLong;
 
 public abstract class AbstractTelegramBot {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractTelegramBot.class);
-	protected final Map<Chat, Pair<Long, String>> answersForChats;
+	protected Received received;
 	protected String token;
 	protected AtomicLong offset = new AtomicLong(0);
 	protected long lastUpdateTime;
@@ -25,9 +27,9 @@ public abstract class AbstractTelegramBot {
 	@Autowired
 	protected MessageSource messageSource;
 
-	public AbstractTelegramBot(String token, Map<Chat, Pair<Long, String>> answersForChats, UpdatesStrategy strategy) {
+	public AbstractTelegramBot(String token, Received received, UpdatesStrategy strategy) {
 		this.token = token;
-		this.answersForChats = answersForChats;
+		this.received = received;
 		this.strategy = strategy;
 	}
 
@@ -53,7 +55,7 @@ public abstract class AbstractTelegramBot {
 		if (o == null || getClass() != o.getClass()) return false;
 		SongsBot bot = (SongsBot) o;
 		return lastUpdateTime == bot.lastUpdateTime &&
-				Objects.equals(answersForChats, bot.answersForChats) &&
+				Objects.equals(received, bot.received) &&
 				Objects.equals(token, bot.token) &&
 				Objects.equals(offset, bot.offset) &&
 				strategy == bot.strategy;
@@ -61,7 +63,7 @@ public abstract class AbstractTelegramBot {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(answersForChats, token, offset, lastUpdateTime, strategy);
+		return Objects.hash(received, token, offset, lastUpdateTime, strategy);
 	}
 
 	@Override
@@ -90,20 +92,16 @@ public abstract class AbstractTelegramBot {
 		return result;
 	}
 
-	public void processUpdates(ResponseService responseService, TelegramBotApiRequestsSender requestsSender, JSONObject... updates) {
-		for (JSONObject update : updates) {
-			String chatType = update.optJSONObject("message")
-					.optJSONObject("chat")
-					.optString("type", "");
+	public void processUpdates(TelegramBotApiRequestsSender requestsSender, ResponseService responseService, Message... updates) {
+		for (Message update : updates) {
+			String chatType = update.getType();
 
 			if (chatType.isEmpty()) {
 				LOGGER.debug("Unable to get chat type: " + update);
 				continue;
 			}
-
 			boolean processed = true;
-
-			if ("private".equalsIgnoreCase(chatType)) {
+			if (chatType.equalsIgnoreCase("private")) {
 				try {
 					processDirectMessage(requestsSender, update);
 				} catch (Exception e) {
@@ -112,7 +110,7 @@ public abstract class AbstractTelegramBot {
 				}
 			} else {
 				try {
-					processGroupMessage(responseService, update);
+					processGroupMessage(requestsSender, responseService, update);
 				} catch (Exception e) {
 					processed = false;
 					LOGGER.error("Unable to process group message", e);
@@ -120,19 +118,20 @@ public abstract class AbstractTelegramBot {
 			}
 
 			if (processed) {
-				long update_id = update.getLong("update_id");
+				long update_id = update.getUpdateId();
 				offset = new AtomicLong(update_id);
 			}
 		}
 	}
 
+
 	protected String getMessageString(String messageName, String lang) {
 		return messageSource.getMessage(messageName, null, Locale.forLanguageTag(lang));
 	}
 
-	protected abstract void processDirectMessage(TelegramBotApiRequestsSender requestsSender, JSONObject update) throws Exception;
+	protected abstract void processDirectMessage(TelegramBotApiRequestsSender requestsSender, Message update) throws Exception;
 
-	protected abstract void processGroupMessage(ResponseService responseService, JSONObject update);
+	protected abstract void processGroupMessage(TelegramBotApiRequestsSender requestsSender, ResponseService responseService, Message update);
 
 	public enum UpdatesStrategy {
 		LONG_POOLING,

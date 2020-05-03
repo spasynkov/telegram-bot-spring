@@ -1,16 +1,19 @@
 package com.example.telegrambotspring.entities.bots;
 
-import com.example.telegrambotspring.entities.Chat;
+import com.example.telegrambotspring.entities.Message;
+import com.example.telegrambotspring.entities.Received;
 import com.example.telegrambotspring.services.ResponseService;
 import com.example.telegrambotspring.services.TelegramBotApiRequestsSender;
-import com.example.telegrambotspring.utils.Pair;
 import com.example.telegrambotspring.utils.Utils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 
 public class SongsBot extends AbstractTelegramBot {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SongsBot.class);
@@ -18,8 +21,8 @@ public class SongsBot extends AbstractTelegramBot {
 	private boolean isMasterModeOn = false;
 	private boolean isAddSongOn = false;
 
-	public SongsBot(String token, Map<Chat, Pair<Long, String>> answersForChats, UpdatesStrategy strategy) {
-		super(token, answersForChats, strategy);
+	public SongsBot(String token, Received received, UpdatesStrategy strategy) {
+		super(token, received, strategy);
 	}
 
 	@Override
@@ -48,11 +51,11 @@ public class SongsBot extends AbstractTelegramBot {
 	}
 
 	@Override
-	protected void processDirectMessage(TelegramBotApiRequestsSender requestsSender, JSONObject update) throws Exception {
-		JSONObject message = update.getJSONObject("message");
-		String lang = message.getJSONObject("from").getString("language_code");
-		String text = message.getString("text");
-		int chatId = message.getJSONObject("chat").getInt("id");
+	protected void processDirectMessage(TelegramBotApiRequestsSender requestsSender, Message update) throws Exception {
+
+		String lang = update.getLanguageCode();
+		String text = update.getText();
+		int chatId = update.getChatId();
 
 		String normalizedText = Utils.normalizeString(text);
 		if ("master".equals(normalizedText)) {
@@ -112,32 +115,25 @@ public class SongsBot extends AbstractTelegramBot {
 		requestsSender.sendMessage(this, chatId, getMessageString("greeting", lang), json);
 	}
 
-	private void sendNotImplemented(TelegramBotApiRequestsSender requestsSender, JSONObject update) throws Exception {
-		int chatId = update.getJSONObject("message").getJSONObject("chat").getInt("id");
+	private void sendNotImplemented(TelegramBotApiRequestsSender requestsSender, Message update) throws Exception {
+		int chatId = update.getChatId();
 		requestsSender.sendMessage(this, chatId, "Not implemented yet!");
 	}
 
-	protected void processGroupMessage(ResponseService responseService, JSONObject update) {
-		JSONObject message = update.getJSONObject("message");
-
-		long date = message.getLong("date");
-		if (System.currentTimeMillis() - Utils._1_MINUTE > date * Utils.MILLIS_MULTIPLIER) {
+	protected void processGroupMessage(TelegramBotApiRequestsSender requestsSender, ResponseService responseService, Message message) {
+		long time = message.getTime();
+		if (System.currentTimeMillis() - Utils._1_MINUTE > time * Utils.MILLIS_MULTIPLIER) {
 			LOGGER.debug("Skipping message as it's too old");
 			return;
 		}
 
-		String text = message.optString("text", "");
-		String response = null;
+		String text = message.getText();
 		try {
-			response = responseService.getResponse(text);
+			String response = responseService.getResponse(text);
+			requestsSender.sendMessage(this, message.getChatId(), response);
 		} catch (Exception e) {
 			LOGGER.error("Unable to find suitable response", e);
 		}
-		if (response != null && !response.isEmpty()) {
-			JSONObject chat = message.getJSONObject("chat");
-			int chatId = chat.getInt("id");
-			String type = chat.getString("type");
-			answersForChats.put(new Chat(chatId, type), new Pair<>(date, response));
-		}
 	}
 }
+
